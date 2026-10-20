@@ -1,0 +1,61 @@
+while True:
+    user_input = input("Enter a number (type 'exit' to quit): ")
+    if user_input == 'exit':
+        print("User has quit.")
+        break
+    else:
+        number = int(user_input)
+        squared = number ** 2
+        print("The square of", number, "is", squared)
+
+import random
+
+def guess_number(secret_number, attempts):
+    for attempt in range(1, attempts + 1):
+        guess = int(input(f"Attempt {attempt}/{attempts}: Enter your guess: "))
+        if guess == secret_number:
+            print(f"Congratulations! You guessed the correct number ({secret_number})!")
+            return
+        elif guess < secret_number:
+            print("Too low! Try again.")
+        else:
+            print("Too high! Try again.")
+    
+    print(f"Out of attempts. The correct number was {secret_number}.")
+
+def main():
+    print("Welcome to the Number Guessing Game!")
+    lower_bound = 1
+    upper_bound = 100
+    secret_number = random.randint(lower_bound, upper_bound)
+    max_attempts = 5
+    guess_number(secret_number, max_attempts)
+
+if __name__ == "__main__":
+    main()
+
+import random 
+
+def roll_dice():
+    return random.randint(1, 6)
+
+def main():
+    print("Welcome to the Dice Rolling Program!")
+    rolls = []
+    while True:
+        input("Press Enter to roll the dice...")
+        result = roll_dice()
+        print(f"You rolled a {result}")
+        rolls.append(result)
+        repeat = input("Roll again? (y/n): ").lower()
+        if repeat != 'y':
+            break
+            
+    print("\nDice Roll Results:")
+    for i, roll in enumerate(rolls, start=1)
+        print(f"Roll {i}: {roll}"")
+              
+    print("\nThank you for using the Dice Rolling Program!")
+              
+if __name__ == "__main__":
+    main()
