@@ -1,0 +1,322 @@
+#qn 5
+import random
+import json
+from collections import deque
+from questions_file import questions
+
+def read_questions_from_file(file_path):
+    with open(file_path, 'r') as file:
+        questions_data = json.load(file)
+    return questions_data
+    
+def generate_quiz(questions, num_questions, randomize_questions, randomize_options):
+    quiz = questions.copy()
+
+    if randomize_questions:
+        random.shuffle(quiz)
+
+    for q in quiz:
+        if randomize_options:
+            random.shuffle(q['options'])
+
+    return quiz[:num_questions]
+
+def take_quiz(quiz):
+    score = 0
+
+    for q in quiz:
+        print("\nQuestion:", q['question'])
+
+        for i, option in enumerate(q['options'], 1):
+            print(f"{i}. {option}")
+
+        user_answer = input("Your answer (1, 2, 3, ...): ")
+
+        if q['options'][int(user_answer) - 1] == q['correct']:
+            print("Correct!")
+            score += 1
+        else:
+            print(f"Wrong! The correct answer is: {q['correct']}")
+
+    return score
+
+def main():
+    print("Welcome to the Quiz!")
+
+    file_path = r"C:\Users\steve\Downloads\text_file1.csv"
+    questions_data = read_questions_from_file(file_path)
+    
+    num_questions = int(input("Enter the number of questions to generate: "))
+    randomize_questions = input("Randomize questions? (yes/no): ").lower() == 'yes'
+    randomize_options = input("Randomize answer options? (yes/no): ").lower() == 'yes'
+
+    quiz = generate_quiz(questions_data, num_questions, randomize_questions, randomize_options)
+
+    score = take_quiz(quiz)
+
+    print(f"\nYour total score: {score}/{num_questions}")
+
+    retake = input("Do you want to retake the quiz? (yes/no): ").lower()
+    if retake != 'yes':
+        print("Thank you for taking the quiz. Goodbye!")
+
+if __name__ == "__main__":
+    main()
+
+#qn 5
+import random
+import json
+from collections import deque
+from questions_file import questions
+
+def read_questions_from_file(file_path):
+    with open(file_path, 'r') as file:
+        questions_data = json.load(file)
+    return questions_data
+    
+def generate_quiz(questions, num_questions, randomize_questions, randomize_options):
+    quiz = questions.copy()
+
+    if randomize_questions:
+        random.shuffle(quiz)
+
+    for q in quiz:
+        if randomize_options:
+            random.shuffle(q['options'])
+
+    return quiz[:num_questions]
+
+def take_quiz(quiz):
+    score = 0
+
+    for q in quiz:
+        print("\nQuestion:", q['question'])
+
+        for i, option in enumerate(q['options'], 1):
+            print(f"{i}. {option}")
+
+        user_answer = input("Your answer (1, 2, 3, ...): ")
+
+        if q['options'][int(user_answer) - 1] == q['correct']:
+            print("Correct!")
+            score += 1
+        else:
+            print(f"Wrong! The correct answer is: {q['correct']}")
+
+    return score
+
+def main():
+    print("Welcome to the Quiz!")
+
+    file_path = r"C:\Users\steve\Downloads\text_file1.csv"
+    questions_data = read_questions_from_file(file_path)
+    
+    num_questions = int(input("Enter the number of questions to generate: "))
+    randomize_questions = input("Randomize questions? (yes/no): ").lower() == 'yes'
+    randomize_options = input("Randomize answer options? (yes/no): ").lower() == 'yes'
+
+    quiz = generate_quiz(questions_data, num_questions, randomize_questions, randomize_options)
+
+    score = take_quiz(quiz)
+
+    print(f"\nYour total score: {score}/{num_questions}")
+
+    retake = input("Do you want to retake the quiz? (yes/no): ").lower()
+    if retake != 'yes':
+        print("Thank you for taking the quiz. Goodbye!")
+
+if __name__ == "__main__":
+    main()
+
+#qn 4
+import re
+
+def menu_display():
+    print("1. Check Palindrome")
+    print("2. Check Palindrome by Word Unit")
+    print("3. Quit")
+
+def palindrome(s):
+    clean_s = re.sub(r'[^a-zA-Z0-9]', '', s.lower())
+    return clean_s == clean_s[::-1]
+
+def palindrome_word_unit(s):
+    clean_s = re.sub(r'[^a-zA-Z0-9 ]', '', s.lower())
+    words = clean_s.split()
+    return words == words[::-1]
+
+# Main program
+while True:
+    menu_display()
+    choice = input("Enter your choice (1-3): ")
+
+    if choice == '1':
+        string_to_check = input("Enter a string to check for palindrome: ")
+        if palindrome(string_to_check):
+            print("It's a palindrome!")
+        else:
+            print("It's not a palindrome.")
+    elif choice == '2':
+        sentence_to_check = input("Enter a sentence to check for palindrome by word unit: ")
+        if palindrome_word_unit(sentence_to_check):
+            print("It's a palindrome by word unit!")
+        else:
+            print("It's not a palindrome by word unit.")
+    elif choice == '3':
+        print("Exiting the program. Goodbye!")
+        break
+    else:
+        print("Invalid choice. Please enter a number between 1 and 3.")
+
+  #qn 5
+import random
+import json
+from collections import deque
+from questions_file import questions
+
+def read_questions_from_file(file_path):
+    with open(file_path, 'r') as file:
+        questions_data = json.load(file)
+    return questions_data
+    
+def generate_quiz(questions, num_questions, randomize_questions, randomize_options):
+    quiz = questions.copy()
+
+    if randomize_questions:
+        random.shuffle(quiz)
+
+    for q in quiz:
+        if randomize_options:
+            random.shuffle(q['options'])
+
+    return quiz[:num_questions]
+
+def take_quiz(quiz):
+    score = 0
+
+    for q in quiz:
+        print("\nQuestion:", q['question'])
+
+        for i, option in enumerate(q['options'], 1):
+            print(f"{i}. {option}")
+
+        user_answer = input("Your answer (1, 2, 3, ...): ")
+
+        if q['options'][int(user_answer) - 1] == q['correct']:
+            print("Correct!")
+            score += 1
+        else:
+            print(f"Wrong! The correct answer is: {q['correct']}")
+
+    return score
+
+def main():
+    print("Welcome to the Quiz!")
+
+    file_path = r"C:\Users\steve\Downloads\text_file1.csv"
+    questions_data = read_questions_from_file(file_path)
+    
+    num_questions = int(input("Enter the number of questions to generate: "))
+    randomize_questions = input("Randomize questions? (yes/no): ").lower() == 'yes'
+    randomize_options = input("Randomize answer options? (yes/no): ").lower() == 'yes'
+
+    quiz = generate_quiz(questions_data, num_questions, randomize_questions, randomize_options)
+
+    score = take_quiz(quiz)
+
+    print(f"\nYour total score: {score}/{num_questions}")
+
+    retake = input("Do you want to retake the quiz? (yes/no): ").lower()
+    if retake != 'yes':
+        print("Thank you for taking the quiz. Goodbye!")
+
+if __name__ == "__main__":
+    main()
+
+import re
+
+# Constants
+MENU_OPTIONS = [
+    "1. Check Palindrome",
+    "2. Check Palindrome by Word Unit",
+    "3. Quit"
+]
+
+def display_menu():
+    print("\n".join(MENU_OPTIONS))
+
+def palindrome(s):
+    clean_s = re.sub(r'[^a-zA-Z0-9]', '', s.lower())
+    return clean_s == clean_s[::-1]
+
+def palindrome_word_unit(s):
+    clean_s = re.sub(r'[^a-zA-Z0-9 ]', '', s.lower())
+    words = clean_s.split()
+    return words == words[::-1]
+
+# Main program
+while True:
+    display_menu()
+    choice = input("Enter your choice (1-3): ")
+
+    if choice == '1':
+        string_to_check = input("Enter a string to check for palindrome: ")
+        if palindrome(string_to_check):
+            print("It's a palindrome!")
+        else:
+            print("It's not a palindrome.")
+    elif choice == '2':
+        sentence_to_check = input("Enter a sentence to check for palindrome by word unit: ")
+        if palindrome_word_unit(sentence_to_check):
+            print("It's a palindrome by word unit!")
+        else:
+            print("It's not a palindrome by word unit.")
+    elif choice == '3':
+        print("Exiting the program. Goodbye!")
+        break
+    else:
+        print("Invalid choice. Please enter a number between 1 and 3.")
+
+  import re
+
+# Constants
+MENU_OPTIONS = [
+    "1. Check Palindrome",
+    "2. Check Palindrome by Word Unit",
+    "3. Quit"
+]
+
+def display_menu():
+    print("\n".join(MENU_OPTIONS))
+
+def palindrome(s):
+    clean_s = re.sub(r'[^a-zA-Z0-9]', '', s.lower())
+    return clean_s == clean_s[::-1]
+
+def palindrome_word_unit(s):
+    clean_s = re.sub(r'[^a-zA-Z0-9 ]', '', s.lower())
+    words = clean_s.split()
+    return words == words[::-1]
+
+# Main program
+while True:
+    display_menu()
+    choice = input("Enter your choice (1-3): ")
+
+    if choice == '1':
+        string_to_check = input("Enter a string to check for palindrome: ")
+        if palindrome(string_to_check):
+            print("It's a palindrome!")
+        else:
+            print("It's not a palindrome.")
+    elif choice == '2':
+        sentence_to_check = input("Enter a sentence to check for palindrome by word unit: ")
+        if palindrome_word_unit(sentence_to_check):
+            print("It's a palindrome by word unit!")
+        else:
+            print("It's not a palindrome by word unit.")
+    elif choice == '3':
+        print("Exiting the program. Goodbye!")
+        break
+    else:
+        print("Invalid choice. Please enter a number between 1 and 3.")
