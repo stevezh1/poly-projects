@@ -1,0 +1,148 @@
+import random
+import time
+
+# Character class
+class Character:
+    def __init__(self, hp, min_hp, max_hp, min_ap, max_ap,
+                 mp, max_mp, sp, magic_skills):
+        self.hp = hp
+        self.min_hp = min_hp
+        self.max_hp = max_hp
+        self.min_ap = min_ap
+        self.max_ap = max_ap
+        self.mp = mp
+        self.max_mp = max_mp
+        self.sp = sp
+        self.magic_skills = magic_skills
+    
+    def reset_stats(self):
+        self.hp = self.max_hp
+        self.mp = self.max_mp
+    
+    def attack(self, target):
+        ap = random.randint(self.min_ap, self.max_ap)
+        target.hp -= ap
+    
+    def heal(self):
+        hp = random.randint(self.min_hp, self.max_hp)
+        self.hp += hp
+
+# Game class
+class Game:
+    def __init__(self):
+        self.players = []
+        self.enemies = []
+        self.game_in_progress = False
+    
+    def start(self):
+        self.create_players()
+        self.enemies = self.create_enemies()
+        self.game_in_progress = True
+        self.turn_based_game()
+
+    def create_players(self):
+        num_players = 3
+        for i in range(num_players):
+            print(f"Player {i+1} - Character Selection:")
+            print("1) Knight")
+            print("2) Warrior")
+            print("3) Mage")
+            choice = int(input("Enter the number corresponding to your character choice: "))
+
+            if choice == 1:
+                character = Character(hp=120, min_hp=15, max_hp=30,
+                                      min_ap=10, max_ap=25,
+                                      mp=15, max_mp=15, sp=10, magic_skills=[])
+            elif choice == 2:
+                character = Character(hp=150, min_hp=0, max_hp=150, 
+                                      min_ap=10, max_ap=20, 
+                                      mp=10, max_mp=10, sp=15, magic_skills=[])
+            elif choice == 3:
+                character = Character(hp=115, min_hp=0, max_hp=115, 
+                                      min_ap=12, max_ap=24, 
+                                      mp=8, max_mp=8, sp=11, magic_skills=[])
+            else:
+                print("Invalid choice! Exiting the game.")
+                exit()
+
+            self.players.append(character)
+
+    def create_enemies(self):
+        return [
+            Character(hp=125, min_hp=0, max_hp=125, 
+                      min_ap=15, max_ap=20, 
+                      mp=12, max_mp=12, sp=15, magic_skills=[]),
+            Character(hp=115, min_hp=0, max_hp=115,
+                      min_ap=12, max_ap=24,
+                      mp=8, max_mp=8, sp=11, magic_skills=[]),
+            Character(hp=150, min_hp=0, max_hp=150, 
+                      min_ap=10, max_ap=20, 
+                      mp=10, max_mp=10, sp=15, magic_skills=[])
+        ]
+    
+    def turn_based_game(self):
+        while self.game_in_progress:
+            for player in self.players:
+                if not self.check_enemies_alive():
+                    print("You defeated all enemies!")
+                    self.game_in_progress = False
+                    break
+                if not self.player_alive(player):
+                    print("Player was defeated!")
+                    break
+                self.player_turn(player)
+                self.enemies_turn()
+    
+    def player_turn(self, player):
+        print("\nPlayer's turn")
+        print("Player HP:", player.hp)
+        print("Choose your action:")
+        print("1) Attack")
+        print("2) Heal")
+        choice = int(input())
+
+        if choice == 1:
+            self.attack_enemy(player)
+        elif choice == 2:
+            player.heal()
+
+    def attack_enemy(self, player):
+        for i, enemy in enumerate(self.enemies):
+            print(f"{i+1}) Enemy HP: {enemy.hp} ", end="")
+
+        choice = input("\nSelect an enemy to attack: ")
+        while not choice.isdigit() or int(choice) < 1 or int(choice) > len(self.enemies):
+            print("Invalid choice! Please enter a valid enemy number.")
+            choice = input("Select an enemy to attack: ")
+
+        choice = int(choice) - 1
+        target_enemy = self.enemies[choice]
+        player.attack(target_enemy)
+        print(f"You attacked enemy {choice+1} and dealt damage.")
+        time.sleep(1)
+    def check_enemies_alive(self):
+        alive_enemies = [enemy for enemy in self.enemies if enemy.hp > 0]
+        self.enemies = alive_enemies
+        return len(self.enemies) > 0
+    
+    def enemies_turn(self):
+        print("\nEnemies' turn")
+        for enemy in self.enemies:
+            for player in self.players:
+                if not self.player_alive(player):
+                    break
+                
+                if enemy.hp > 0:
+                    print(f"Enemy HP: {enemy.hp} ", end="")
+                    enemy.attack(player)
+                    print("Enemy attacked and dealt damage to a player.")
+                    time.sleep(1)
+                    if not self.player_alive(player):
+                        break
+
+    def player_alive(self, player):
+        return player.hp > 0
+
+# Start the game
+game = Game()
+game.start()
