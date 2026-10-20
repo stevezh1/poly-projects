@@ -1,0 +1,75 @@
+#load library
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split, GridSearchCV, ShuffleSplit, cross_val_score
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder, OrdinalEncoder, TargetEncoder
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+import shap
+randomstate = 2312345
+
+#load dataset
+df = pd.read_csv('/content/Telco24.csv')
+df.head()
+
+df.describe()
+
+#identify target. you may also consider using '2023_number_of_products - 2022_number_of_products' as a target.
+target = '2023_number_of_products'
+
+#EDA to identify potential opportunities as predictors for your target
+#plot 2022_bugs_reported against 2023_number_of_products
+
+#seaborn
+import seaborn as sns
+sns.scatterplot(data=df, x='2022_bugs_reported', y='2023_number_of_products',hue='2022_number_of_products')
+
+df['2022_bugs_reported_per_product'] = df['2022_bugs_reported'] / df['2022_number_of_products']
+sns.scatterplot(data=df, x='2022_bugs_reported_per_product', y='2023_number_of_products',hue='2022_number_of_products')
+
+df['2022_bugs_faced_per_product'] = df['2022_bugs_faced_from_product_types'] / df['2022_number_of_products']
+sns.scatterplot(data=df, x='2022_bugs_faced_per_product', y='2023_number_of_products',hue='2022_number_of_products')
+
+df.fillna(0, inplace=True)
+print(df.isnull().sum())
+print(df.describe())
+
+df_num = df.select_dtypes(exclude=['object'])
+df_cat = df.select_dtypes(include=['object'])
+le = LabelEncoder()
+df_cat = df_cat.apply(le.fit_transform)
+df = pd.concat([df_num, df_cat], axis=1)
+X = df.drop(target, axis=1)
+y = df[target]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=randomstate)
+
+#perform Linear Regression
+from sklearn.linear_model import LinearRegression
+lr = LinearRegression()
+lr.fit(X_train, y_train)
+y_pred_lr = lr.predict(X_test)
+print('Mean Absolute Error:', mean_absolute_error(y_test, y_pred_lr))
+print('Mean Squared Error:', mean_squared_error(y_test, y_pred_lr))
+
+#perform Decision Tree Regressor
+from sklearn.tree import DecisionTreeRegressor
+dt = DecisionTreeRegressor()
+dt.fit(X_train, y_train)
+y_pred_dt = dt.predict(X_test)
+print('Mean Absolute Error:', mean_absolute_error(y_test, y_pred_dt))
+print('Mean Squared Error:', mean_squared_error(y_test, y_pred_dt))
+
+#lineplot the results
+plt.figure(figsize=(15,5))
+plt.plot(y_test.reset_index(drop=True), label='Actual')
+plt.plot(y_pred_lr, label='Linear Regression')
+plt.plot(y_pred_dt, label='Decision Tree Regressor')
+plt.legend()
+plt.xlim(1000,1100)
+plt.show()
+
+#comment on model and results
+#take action if target leakage is a concern.
