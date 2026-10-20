@@ -1,0 +1,278 @@
+#load library
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
+import pandas as pd
+
+#retrieve your solution part 1 benchmarks code or use codes provided by tutor available at a later date.
+df = pd.read_csv('Telco24.csv', nrows=20)
+
+# Remove the 'customer_id' column
+df = df.drop(columns=['customer_id'])
+
+df.head()
+df.info()
+df.describe()
+
+#identify target
+# Identify and assign the target variable
+target = '2023_number_of_products'
+y = df[target]
+
+# Check the target data
+print(y.head())
+
+# Create feature matrix (predictors)
+X = df.drop(columns=[target])
+
+# Verify predictors
+print(X.head())
+
+# Create feature matrix (predictors)
+X = df.drop(columns=[target])
+
+# Verify predictors
+print(X.head())
+
+# Verify target variable
+print("Target variable:")
+print(y.head())
+
+#check target distribution
+
+import seaborn as sns
+sns.histplot(y, kde=True)
+
+#EDA to identify potential opportunities as predictors for your target
+print(df.info())
+print(df.describe())
+
+print(df.isnull().sum())
+
+#setup df to contain all scores across various "engineering" or PDCA cycles, for easy reading
+#load all the necessary libraries
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import sklearn
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.preprocessing import LabelEncoder,  OneHotEncoder,OrdinalEncoder
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score , mean_absolute_percentage_error
+from sklearn.model_selection import ShuffleSplit
+from sklearn.model_selection import cross_val_score
+from ipywidgets import interact
+randomstate=123456
+
+pip install shap
+
+
+telco = pd.read_csv('/content/Telco24.csv')
+print(telco.shape)
+
+#save point
+df_in = final_df.copy()
+
+#EDA to identify potential opportunities as predictors for your target
+telco = pd.read_csv('/content/Telco24.csv')
+print(telco.info())
+print(telco.describe())
+
+print(telco.isnull().sum())
+
+# Check the column names
+print(df.columns)
+
+# Define X (features) and y (target variable)
+X = df.drop(columns=['customer_id'])
+y = df['2023_number_of_products']
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+print("Data split complete")
+
+# Define X (features) and y (target variable)
+X = df.drop(columns=['2022_sales_call', '2022_employment_type',
+                     'last_upgrade_till_end_of_2022', '2022_number_of_products',
+                     '2022_discount', '2022_ad_spent', '2022_bugs_faced_from_product_types',
+                     '2022_bugs_reported', '2022_interactions'], errors='ignore').select_dtypes(include='number')
+y = df['2023_number_of_products']
+
+# Check columns in the original and numeric-only DataFrame
+print("Columns in the original DataFrame:")
+print(df.columns)
+
+print("Columns in the numeric DataFrame:")
+print(df_numeric.columns)
+
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error
+
+# Load your dataset
+df = pd.read_csv('Telco24.csv')
+
+# Drop non-numeric columns
+df_numeric = df.select_dtypes(include=[np.number])
+
+# Define X (features) and y (target variable)
+X = df_numeric.drop(columns=['2022_sales_call', '2022_employment_type',
+                             'last_upgrade_till_end_of_2022', '2022_number_of_products',
+                             '2022_discount', '2022_ad_spent', '2022_bugs_faced_from_product_types',
+                             '2022_bugs_reported', '2022_interactions'], errors='ignore')
+y = df['2023_number_of_products']
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the model
+lr = LinearRegression()
+lr.fit(X_train, y_train)
+
+# Make predictions
+y_pred_lr = lr.predict(X_test)
+
+# Calculate and print evaluation metrics
+print('Mean Absolute Error:', mean_absolute_error(y_test, y_pred_lr))
+
+
+
+# R-squared
+r2 = r2_score(y_test, y_pred_lr)
+
+# Mean Absolute Error (MAE)
+mae = mean_absolute_error(y_test, y_pred_lr)
+
+# Mean Squared Error (MSE)
+mse = mean_squared_error(y_test, y_pred_lr)
+
+# Root Mean Squared Error (RMSE)
+rmse = np.sqrt(mse)
+
+# Print the metrics
+print("R-squared (R²):", r2)
+print("Mean Absolute Error (MAE):", mae)
+print("Mean Squared Error (MSE):", mse)
+print("Root Mean Squared Error (RMSE):", rmse)
+
+# Define X (features) and y (target variable)
+X = df_numeric.drop(columns=['2022_sales_call', '2022_employment_type',
+                             'last_upgrade_till_end_of_2022', '2022_number_of_products',
+                             '2022_discount', '2022_ad_spent', '2022_bugs_faced_from_product_types',
+                             '2022_bugs_reported', '2022_interactions'], errors='ignore')
+y = df['2023_number_of_products']
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Separate categorical and numerical columns
+cat_col = X.select_dtypes(include='object').columns
+num_col = X.select_dtypes(exclude='object').columns
+
+# Define preprocessing for categorical and numerical columns
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', StandardScaler(), num_col),
+        ('cat', OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1), cat_col),
+    ],
+    remainder='passthrough'
+)
+
+# Define the model pipeline
+dtr = DecisionTreeRegressor(random_state=42)
+pipe = Pipeline([
+    ('preprocessor', preprocessor),
+    ('dtr', dtr)
+])
+
+# Define the parameter grid for hyperparameter tuning
+param_grid = {
+    'dtr__max_depth': [5, 10, 20, None],
+    'dtr__min_samples_split': [2, 5, 10],
+    'dtr__min_samples_leaf': [1, 2, 4]
+}
+
+# Set up cross-validation and grid search
+cv = ShuffleSplit(n_splits=5, test_size=0.2, random_state=42)
+grid_search = GridSearchCV(pipe, param_grid, cv=cv, scoring='neg_mean_absolute_error', n_jobs=-1)
+grid_search.fit(X_train, y_train)
+
+# Display best parameters and score
+print(f"Best parameters: {grid_search.best_params_}")
+print(f"Best cross-validation score (MAE): {-grid_search.best_score_}")
+
+# Evaluate on training and test sets
+best_model = grid_search.best_estimator_
+train_score = -cross_val_score(best_model, X_train, y_train, cv=cv, scoring='neg_mean_absolute_error').mean()
+test_score = -cross_val_score(best_model, X_test, y_test, cv=cv, scoring='neg_mean_absolute_error').mean()
+
+print(f"Train MAE: {train_score:.4f}")
+print(f"Test MAE: {test_score:.4f}")
+
+#load point
+df_out = df_in.copy()
+
+#P
+#Idea for predictor
+
+#Predictor Idea: Using historical customer data (e.g., sales calls, number of products, discounts, ad spend) to predict customer retention or future product purchases.
+#Potential Features: 2022_sales_call, 2022_number_of_products, 2022_discount, 2022_ad_spent, 2022_bugs_faced_from_product_types, 2022_interactions.
+#Target: Predict the 2023_number_of_products or customer churn.
+
+#D
+#How to demostrate the idea?
+
+#Data Exploration: Begin by performing exploratory data analysis (EDA) to understand the relationships between various features. For example, we could look at correlations between 2022_sales_call and 2023_number_of_products, or 2022_bugs_reported and 2022_ad_spent.
+#Modeling: Use machine learning algorithms such as regression models, decision trees, or random forests to model the relationship between the features and target.
+#Validation: Implement cross-validation to assess model performance on unseen data and evaluate using metrics like R-squared, Mean Squared Error (MSE), and Mean Absolute Error (MAE).
+
+#C
+#Is it better?
+
+#Evaluation: After training the model, we compare its performance using multiple metrics. If the model provides accurate predictions with reasonable error margins, it can be deemed as "better."
+#Improvement: If the model doesn’t perform well, we could tweak features (e.g., introducing interaction terms) or try advanced algorithms like gradient boosting or neural networks.
+#Comparison: Compare the model performance with a baseline model (e.g., predicting based on the mean value of the target variable).
+
+#A
+#Accept or reject, moving forward?
+
+#Decision: If the model performs well in predicting customer behavior (e.g., number of products in 2023), then it can be accepted, and we can proceed to deploy it in the real-world system to make predictions for new customers.
+#Action Plan: Move forward with enhancing the customer experience based on model insights (e.g., targeting specific customers for discounts or additional products).
+
+#save point if accepted
+df_in = df_out.copy()
+
+#load point for next cycle
+df_out = df_in.copy()
+
+#P
+#Idea
+
+#D
+#How to demostrate the idea?
+
+#C
+#Is it better?
+
+#A
+#Accept or reject, moving forward?
+
+#save point
+df_in = df_out.copy()
+
+#final model
+
+#final results, scoring and lineplot
