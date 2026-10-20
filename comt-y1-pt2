@@ -1,0 +1,489 @@
+import tkinter as tk
+import random
+import time
+
+# Character class
+class Character:
+    def __init__(self, name, hp, min_hp, max_hp, min_ap, max_ap, min_combo, max_combo,
+                 mp, max_mp, sp, magic_skills):
+        self.name = name
+        self.hp = hp
+        self.min_hp = min_hp
+        self.max_hp = max_hp
+        self.min_ap = min_ap
+        self.max_ap = max_ap
+        self.min_combo = min_combo
+        self.max_combo = max_combo
+        self.mp = mp
+        self.max_mp = max_mp
+        self.sp = sp
+        self.magic_skills = magic_skills
+    
+    def reset_stats(self):
+        self.hp = self.max_hp
+        self.mp = self.max_mp
+    
+    def attack(self, target):
+        ap = random.randint(self.min_ap, self.max_ap)
+        target.hp -= ap
+        
+    def combo_damage(self, target):
+        combo_ap = random.randint(self.min_combo, self.max_combo)
+        target.hp -= combo_ap
+    
+    def health_boost(self):
+        hp = random.randint(self.min_hp, self.max_hp)
+        self.hp += hp
+    
+    def slow_venom(self, target):
+        damage_per_turn = 20
+        print(f"{target.name} is affected by slow venom!")
+        for _ in range(3):  # Duration of 3 turns
+            target.hp -= damage_per_turn
+            print(f"{target.name} takes {damage_per_turn} damage from slow venom!")
+            
+    def time_warp(self):
+        print("Using Time Warp!")
+        print("You skip this turn and avoid damage.")
+
+# Game class
+class Game:
+    def __init__(self):
+        self.players = []
+        self.enemies = []
+        self.game_in_progress = False
+    
+    def start(self):
+        self.create_players()
+        self.enemies = self.create_enemies()
+        self.game_in_progress = True
+        self.turn_based_game()
+
+    def create_players(self):
+        available_characters = [
+            ("Knight", {
+                "magic_skills": ["combo_damage"],
+                "sp": 10
+            }),
+            ("Warrior", {
+                "magic_skills": ["time_warp", "health_boost"],
+                "sp": 15
+            }),
+            ("Mage", {
+                "magic_skills": ["slow_venom"],
+                "sp": 8
+            })
+        ]
+        
+        num_players = 3
+        for i in range(num_players):
+            print(f"Player {i+1} - Character Selection:")
+            for j, (character_name, character_data) in enumerate(available_characters):
+                magic_skills = character_data["magic_skills"]
+                magic_skills_str = ", ".join(magic_skills)
+                sp = character_data["sp"]
+                print(f"{j+1}) {character_name} (Magic Skills: {magic_skills_str}) (Speed: {sp})")
+
+            print(f"{len(available_characters) + 1}) Quit")
+            choice = int(input("Select your Character: "))
+
+            if choice < 1 or choice > len(available_characters) + 1:
+                print("Invalid choice! Exiting the game.")
+                exit()
+
+            if choice == len(available_characters) + 1:
+                print("Quitting the game.")
+                exit()
+
+            character_name, character_data = available_characters.pop(choice - 1)
+            magic_skills = character_data["magic_skills"]
+            sp = character_data["sp"]
+            character = Character(
+                name=f"Player {i+1}",
+                hp=120, min_hp=15, max_hp=30,
+                min_ap=10, max_ap=25, min_combo=25, max_combo=50,
+                mp=15, max_mp=15, sp=sp,
+                magic_skills=magic_skills
+            )
+            self.players.append(character)
+
+    def create_enemies(self):
+        return [
+            Character(name="Enemy 1", hp=125, min_hp=0, max_hp=125, 
+                      min_ap=15, max_ap=20, min_combo=0, max_combo=0,
+                      mp=12, max_mp=12, sp=15, magic_skills=[]),
+            Character(name="Enemy 2", hp=115, min_hp=0, max_hp=115,
+                      min_ap=12, max_ap=24, min_combo=0, max_combo=0,
+                      mp=8, max_mp=8, sp=11, magic_skills=[]),
+            Character(name="Enemy 3", hp=150, min_hp=0, max_hp=150, 
+                      min_ap=10, max_ap=20, min_combo=0, max_combo=0,
+                      mp=10, max_mp=10, sp=15, magic_skills=[])
+        ]
+    
+    def turn_based_game(self):
+        while self.game_in_progress:
+            all_characters = self.players + self.enemies
+            all_characters.sort(key=lambda x: x.sp, reverse=True)  # Sort by speed
+            for character in all_characters:
+                if isinstance(character, Character):  # Check if it's a player
+                    if not self.check_enemies_alive():
+                        print("You defeated all enemies!")
+                        self.game_in_progress = False
+                        break
+                    if not self.player_alive(character):
+                        print("Player was defeated!")
+                        break
+                    self.player_turn(character)
+                else:
+                    self.enemy_turn(character)
+
+    
+    def player_turn(self, player):
+        print(f"\n{player.name} - Player's turn")
+        print("Player HP:", player.hp)
+        print("Choose your action:")
+        print("1) Attack")
+        if "combo_damage" in player.magic_skills:
+            print("2) Combo Damage")
+        if "time_warp" in player.magic_skills:
+            print("3) Time Warp")
+        if "health_boost" in player.magic_skills:
+            print("4) Health Boost")
+        if "slow_venom" in player.magic_skills:
+            print("5) Slow Venom")
+        choice = int(input())
+
+        if choice == 1:
+            self.attack_enemy(player)
+        elif choice == 2 and "combo_damage" in player.magic_skills:
+            target = self.select_enemy()
+            player.combo_damage(target)
+        elif choice == 3 and "time_warp" in player.magic_skills:
+            player.time_warp()
+        elif choice == 4 and "health_boost" in player.magic_skills:
+            player.health_boost()
+        elif choice == 5 and "slow_venom" in player.magic_skills:
+            target = self.select_enemy()
+            player.slow_venom(target)
+    
+    def select_enemy(self):
+        print("Select an enemy to target:")
+        for i, enemy in enumerate(self.enemies):
+            print(f"{i+1}) {enemy.name} (HP: {enemy.hp})")
+        choice = int(input())
+        while choice < 1 or choice > len(self.enemies):
+            print("Invalid choice! Please enter a valid enemy number.")
+            choice = int(input())
+        return self.enemies[choice - 1]
+            
+    def attack_enemy(self, player):
+        for i, enemy in enumerate(self.enemies):
+            print(f"{i+1}) Enemy HP: {enemy.hp} ", end="")
+
+        choice = input("\nSelect an enemy to attack: ")
+        while not choice.isdigit() or int(choice) < 1 or int(choice) > len(self.enemies):
+            print("Invalid choice! Please enter a valid enemy number.")
+            choice = input("Select an enemy to attack: ")
+
+        choice = int(choice) - 1
+        target_enemy = self.enemies[choice]
+        player.attack(target_enemy)
+        print(f"You attacked enemy {choice+1} and dealt damage.")
+        time.sleep(1)
+        
+    def check_enemies_alive(self):
+        alive_enemies = [enemy for enemy in self.enemies if enemy.hp > 0]
+        self.enemies = alive_enemies
+        return len(self.enemies) > 0
+    
+    def enemies_turn(self):
+        print("\nEnemies' turn")
+        for enemy in self.enemies:
+            if not self.check_players_alive():
+                break
+            
+            if enemy.hp > 0:
+                print(f"Enemy HP: {enemy.hp} ", end="")
+                target_player = random.choice(self.players)
+                enemy.attack(target_player)
+                print(f"Enemy attacked {target_player.name} and dealt damage.")
+                time.sleep(1)
+                if not self.player_alive(target_player):
+                    print(f"{target_player.name} was defeated!")
+        
+    def check_players_alive(self):
+        alive_players = [player for player in self.players if player.hp > 0]
+        self.players = alive_players
+        return len(self.players) > 0
+
+    def player_alive(self, player):
+        return player.hp > 0
+
+root = tk.Tk()
+root.title("tk")  # Set the title of the window
+
+class SettingsFrame(tk.Frame):
+    def __init__(self, master):
+        tk.Frame.__init__(self, master)
+        self.master = master
+        self.master.title("Settings")
+
+        volume_label = tk.Label(self, text="Adjust Volume:")
+        volume_label.pack()
+
+        volume_scale = tk.Scale(self, from_=0, to=100, orient=tk.HORIZONTAL)
+        volume_scale.pack()
+
+        difficulty_label = tk.Label(self, text="Difficulty Level:")
+        difficulty_label.pack()
+
+        difficulty_scale = tk.Scale(self, from_=1, to=3, orient=tk.HORIZONTAL,
+                                    labels=["Easy", "Medium", "Difficult"])
+        difficulty_scale.pack()
+
+        button7 = tk.Button(
+            self,
+            text="English",
+            width=15,
+            height=5,
+            bg="green",
+            fg="white"
+        )
+        button7.pack(padx=20, anchor="center")
+
+        button8 = tk.Button(
+            self,
+            text="Chinese",
+            width=15,
+            height=5,
+            bg="blue",
+            fg="white"
+        )
+        button8.pack(padx=20, anchor="center")
+
+        button9 = tk.Button(
+            self,
+            text="Malay",
+            width=15,
+            height=5,
+            bg="red",
+            fg="white"
+        )
+        button9.pack(padx=20, anchor="center")
+
+class GameGUI(tk.Tk):
+    def __init__(self, parent, controller):
+        super().__init__()
+        self.title("My RPG Game")
+        self.geometry("800x600")
+
+        self.game = Game()
+        self.current_frame = None
+
+        self.frames = {}
+
+        start_page = StartPage(self, self.game)
+        selection_page = SelectionPage(self, self.game)
+        battle_page = BattlePage(self, self.game) 
+
+        self.frames["StartPage"] = start_page
+        self.frames["SelectionPage"] = selection_page
+        self.frames["BattlePage"] = battle_page
+
+        self.show_frame("StartPage")
+
+    def show_frame(self, frame_name):
+        frame = self.frames[frame_name]
+        if self.current_frame:
+            self.current_frame.pack_forget()
+        frame.pack()
+        self.current_frame = frame
+
+class StartPage(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        label = tk.Label(self, text="Main Menu")
+        label.pack(pady=10)
+
+        start_button = tk.Button(self, text="Start", command=self.start_game)
+        start_button.pack(pady=20, anchor="center")
+
+        settings_button = tk.Button(self, text="Settings", command=self.settings)
+        settings_button.pack(pady=20, anchor="center")
+
+        quit_button = tk.Button(self, text="Quit", command=self.quit_game)
+        quit_button.pack(pady=20, anchor="center")
+
+    def start_game(self):
+        self.parent.show_frame("SelectionPage")
+
+    def settings(self):
+        self.parent.show_frame("SettingsPage")
+
+    def quit_game(self):
+        self.parent.destroy()  # Close the entire application
+
+class SelectionPage(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        
+        label = tk.Label(self, text="Player Selection")
+        label.pack(pady=10)
+        
+        self.characters = [
+            {"name": "Knight", "stats": "HP: 120, AP: 10-25, Speed: 10"},
+            {"name": "Warrior", "stats": "HP: 120, AP: 10-25, Speed: 15"},
+            {"name": "Mage", "stats": "HP: 120, AP: 10-25, Speed: 8"}
+        ]
+        
+        for char_info in self.characters:
+            button = tk.Button(
+                self,
+                text=f"Select {char_info['name']}",
+                width=20,
+                height=2,
+                command=lambda char=char_info: self.select_character(char)
+            )
+            button.pack(pady=10)
+        
+    def select_character(self, character):
+        selected_char_name = character["name"]
+        selected_char_stats = character["stats"]
+        
+        print(f"You selected {selected_char_name} with stats: {selected_char_stats}")
+        # Perform any additional actions related to character selection
+        
+        # Create and pack buttons for player selection
+        self.button4 = tk.Button(
+            self,
+            text="Select Player 1",
+            width=15,
+            height=5,
+            bg="green",
+            fg="white",
+            command=self.Player1
+        )
+        self.button4.pack(pady=20, anchor="center")
+        
+        self.button5 = tk.Button(
+            self,
+            text="Select Player 2",
+            width=15,
+            height=5,
+            bg="blue",
+            fg="white",
+            command=self.Player2
+        )
+        self.button5.pack(pady=20, anchor="center")
+        
+        self.button6 = tk.Button(
+            self,
+            text="Select Player 3",
+            width=15,
+            height=5,
+            bg="red",
+            fg="white",
+            command=self.Player3
+        )
+        self.button6.pack(pady=20, anchor="center")
+    
+    def Player1(self):
+        self.controller.show_frame("BattlePage")
+        self.button4.config(state="disabled")  # Disable the button
+        
+    def Player2(self):
+        self.controller.show_frame("BattlePage")
+        self.button5.config(state="disabled")  # Disable the button
+        
+    def Player3(self):
+        self.controller.show_frame("BattlePage")
+        self.button6.config(state="disabled")  # Disable the button
+                   
+class BattlePage(tk.Frame):
+    def __init__(self, parent, controller, game):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.game = game  # Store the game instance
+        self.enemies = self.game.enemies
+        self.players = self.game.players
+
+        label = tk.Label(self, text="Battle Page")
+        label.pack(pady=10)
+
+        # AttackPage content
+        label = tk.Label(self, text="Select your attack:")
+        label.pack()
+
+        attack_options = ["Combo Damage", "Time Warp", "Health Boost", "Slow Venom"]
+        selected_attack = tk.StringVar()
+        selected_attack.set(attack_options[0])
+
+        option_menu = tk.OptionMenu(self, selected_attack, *attack_options)
+        option_menu.pack()
+
+        attack_button1 = tk.Button(self, text="Combo Damage", command=self.perform_attack)
+        attack_button1.pack()
+
+        # Add other attack buttons similarly
+
+        back_button = tk.Button(self, text="Back to Selection", command=self.back_to_selection)
+        back_button.pack(pady=20)
+
+    def perform_attack(self):
+        selected_attack = self.selected_attack.get()
+        print(f"Performing attack: {selected_attack}")
+        self.controller.show_frame("BattlePage")  # Close the attack screen
+
+    def enemy_attack(self):
+        print("\nEnemies' turn")
+        for enemy in self.enemies:
+            if not self.check_players_alive():
+                break
+
+            if enemy.hp > 0:
+                print(f"Enemy HP: {enemy.hp} ", end="")
+                target_player = random.choice(self.players)
+                enemy.attack(target_player)  # Call NPC's attack method
+                print(f"Enemy attacked {target_player.name} and dealt damage.")
+                time.sleep(1)
+                if not self.player_alive(target_player):
+                    print(f"{target_player.name} was defeated!")
+
+    def back_to_selection(self):
+        self.controller.show_frame("SelectionPage")
+        
+class MyApp(tk.Tk):
+    def __init__(self):
+        tk.Tk.__init__(self)
+        self.frames = {}
+        self.game = Game()  # Create a game instance
+        
+        container = tk.Frame(self)
+        container.pack(side="top", fill="both", expand=True)
+        container.grid_rowconfigure(0, weight=1)
+        container.grid_columnconfigure(0, weight=1)
+
+        self.frames = {}
+        for F in (StartPage, SelectionPage, BattlePage):
+            page_name = F.__name__
+            if F == BattlePage:
+                frame = F(parent=self, controller=self, game=self.game)  # Pass game instance
+            else:
+                frame = F(parent=self, controller=self)  # StartPage and SelectionPage
+            self.frames[page_name] = frame
+            frame.pack()
+            
+        frame.grid(row=0, column=0, sticky="nsew")
+
+        self.change_frame("StartPage")
+
+    def change_frame(self, page_name):
+        frame = self.frames[page_name]
+        frame.tkraise()
+
+if __name__ == "__main__":
+    app = MyApp()
+    app.mainloop()
