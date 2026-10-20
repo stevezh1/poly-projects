@@ -1,0 +1,64 @@
+# The program will randomly generate a number between 1 and 100. It will display the generated number and ask the user if it is a prime number. User's task is to provide the correct answer. If the answer is incorrect, the program will continue generating new numbers until the user provide the correct response. To determine if a number is prime, the program will use a function called is_prime(), which takes a number as an input parameter and returns True if the number is prime, and False otherwise.
+
+Code the program and the function is_prime()
+
+Hint: A prime number is a natural number greater than 1 that can only be divided by 1 and itself
+
+You may import the random library and uses its function random.randint(startValue,endValue) to generate the random number.
+
+import random
+
+def is_prime(n):
+    """Check if a number is a prime number."""
+    if n <= 1:
+        return False
+    
+    for i in range(2,n):
+        #what is the condition for if ?
+            return False
+    
+    return True
+
+
+"""Play the prime number guessing game."""
+correct_answer = False
+while not correct_answer:
+    #How to genereate random int 1 - 100
+    print(f'The number is {num}.')
+    user_response = input('Is this a prime number? (yes/no): ').lower()
+    #What are conditions when the user guess correctly?
+        correct_answer = True
+        print('Correct answer!')
+    else:
+        print('Incorrect answer. Try again!')
+
+total_marks = 0
+number_of_entry = 0
+
+while True:
+
+    mark = input("Enter marks (or 'stop' to stop): ")
+    if mark.lower() == 'stop':
+        #here how to stop the while loop?
+    mark = int(mark)
+    if mark < 0 or mark > 100:
+        print("Mark must be between 0 and 100. Try again.")
+    else:
+        total_marks = total_marks + mark
+        number_of_entry = number_of_entry + 1
+
+# calculate average grade    
+avg_mark = total_marks / number_of_entry
+print(f"Average mark: {avg_mark}")
+
+# determine final grade -- here we did many times
+if avg_mark >= 90:
+    print("Final Grade: A")
+elif avg_mark >= 80:
+    print("Final Grade: B")
+elif avg_mark >= 70:
+    print("Final Grade: C")
+elif avg_mark >= 60:
+    print("Final Grade: D")
+else:
+    print("Final Grade: F")
