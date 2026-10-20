@@ -1,0 +1,14 @@
+pip install praw
+
+import praw
+import pandas as pd
+from praw.models import MoreComments
+
+r = praw.Reddit(client_id="5Y9MPO8JhyQKZaqa1WFUyQ",
+client_secret="Ml9_8IDbaPJfCj0SjBip1x5cWdhDTw",
+user_agent="TPStudent1161",
+)
+
+top_posts= r.subreddit('aviation').top(limit=20)
+for post in top_posts:
+     print(post.title)
