@@ -1,0 +1,247 @@
+pip install praw
+
+import praw
+import pandas as pd
+from praw.models import MoreComments
+import numpy as np
+
+r = praw.Reddit(client_id="5Y9MPO8JhyQKZaqa1WFUyQ",
+client_secret="Ml9_8IDbaPJfCj0SjBip1x5cWdhDTw",
+user_agent="TPStudent1161",
+)
+
+top_posts= r.subreddit('aviation').top(limit=50)
+
+titles_list = []
+upvotes_list = []
+downvotes_list = []
+upvote_ratios_list = []
+scores_list = []
+num_comments_list = []
+publish_date_list = []
+
+for post in top_posts:
+    upvotes = int(post.upvote_ratio * post.score)  #upvotes
+    downvotes = int(post.score - upvotes)  #downvotes
+    upvote_ratio = post.upvote_ratio
+    score = post.score
+    num_comments = post.num_comments
+    title = post.title
+    publish_date = pd.to_datetime(post.created_utc, unit='s').strftime('%Y-%m-%d %H:%M:%S')
+
+    titles_list.append(title)
+    upvotes_list.append(upvotes)
+    downvotes_list.append(downvotes)
+    upvote_ratios_list.append(upvote_ratio)
+    scores_list.append(score)
+    num_comments_list.append(num_comments)
+    publish_date_list.append(publish_date)
+
+aviation_df = pd.DataFrame({
+    'Title': titles_list,
+    'Upvotes': upvotes_list,
+    'Downvotes': downvotes_list,
+    'Upvote Ratio': upvote_ratios_list,
+    'Score': scores_list,
+    'Number of Comments': num_comments_list,
+    'Date and Time': publish_date_list
+    })
+
+aviation_df.index = aviation_df.index + 0 #start from 1 at first row
+
+# Use pandas str accessor for string operations efficiently
+aviation_df['Downvotes'] = aviation_df['Downvotes'].astype(int)
+aviation_df['Number of Comments'] = aviation_df['Number of Comments'].astype(int)
+aviation_df['Downvote/Comment (Ratio)'] = aviation_df['Downvotes'] / aviation_df['Number of Comments']
+aviation_df['Downvote/Comment (Ratio)'] = aviation_df['Downvote/Comment (Ratio)'].round(2).astype(str)
+aviation_df['Upvote/Comment (Ratio)'] = aviation_df['Upvotes'] / aviation_df['Number of Comments']
+aviation_df['Upvote/Comment (Ratio)'] = aviation_df['Upvote/Comment (Ratio)'].round(2).astype(str)
+print(aviation_df)
+
+import matplotlib.pyplot as plt
+import praw
+from datetime import datetime
+import pandas as pd
+import seaborn as sns
+
+upvotes = aviation_df['Upvotes']
+downvotes = aviation_df['Downvotes']
+upvote_ratios = aviation_df['Upvote Ratio']
+score = aviation_df['Score']
+num_comments = aviation_df['Number of Comments']
+downvote_comment_ratio = aviation_df['Downvote/Comment (Ratio)']
+upvote_comment_ratio = aviation_df['Upvote/Comment (Ratio)']
+
+# Calculate the statistics
+mean = upvotes.mean()
+median = upvotes.median()
+std_dev = upvotes.std()
+variance = upvotes.var()
+min_value = upvotes.min()
+max_value = upvotes.max()
+q1 = upvotes.quantile(0.25)
+q3 = upvotes.quantile(0.75)
+
+# Print out the statistics
+print(f"Statistics for Upvotes:")
+print(f"Mean: {mean:.2f}")
+print(f"Median: {median:.2f}")
+print(f"Standard Deviation: {std_dev:.2f}")
+print(f"Variance: {variance:.2f}")
+print(f"Minimum: {min_value}")
+print(f"Maximum: {max_value}")
+print(f"1st Quartile (Q1): {q1}")
+print(f"3rd Quartile (Q3): {q3}")
+
+mean = downvotes.mean()
+median = downvotes.median()
+std_dev = downvotes.std()
+variance = downvotes.var()
+min_value = downvotes.min()
+max_value = downvotes.max()
+q1 = downvotes.quantile(0.25)
+q3 = downvotes.quantile(0.75)
+
+print()
+
+# Print out the statistics
+print(f"Statistics for Downvotes:")
+print(f"Mean: {mean:.2f}")
+print(f"Median: {median:.2f}")
+print(f"Standard Deviation: {std_dev:.2f}")
+print(f"Variance: {variance:.2f}")
+print(f"Minimum: {min_value}")
+print(f"Maximum: {max_value}")
+print(f"1st Quartile (Q1): {q1}")
+print(f"3rd Quartile (Q3): {q3}")
+
+mean = upvote_ratios.mean()
+median = upvote_ratios.median()
+std_dev = upvote_ratios.std()
+variance = upvote_ratios.var()
+min_value = upvote_ratios.min()
+max_value = upvote_ratios.max()
+q1 = upvote_ratios.quantile(0.25)
+q3 = upvote_ratios.quantile(0.75)
+
+print()
+
+# Print out the statistics
+print(f"Statistics for Upvote Ratios:")
+print(f"Mean: {mean:.2f}")
+print(f"Median: {median:.2f}")
+print(f"Standard Deviation: {std_dev:.2f}")
+print(f"Variance: {variance:.2f}")
+print(f"Minimum: {min_value}")
+print(f"Maximum: {max_value}")
+print(f"1st Quartile (Q1): {q1}")
+print(f"3rd Quartile (Q3): {q3}")
+
+mean = score.mean()
+median = score.median()
+std_dev = score.std()
+variance = score.var()
+min_value = score.min()
+max_value = score.max()
+q1 = score.quantile(0.25)
+q3 = score.quantile(0.75)
+
+print()
+
+# Print out the statistics
+print(f"Statistics for Scores:")
+print(f"Mean: {mean:.2f}")
+print(f"Median: {median:.2f}")
+print(f"Standard Deviation: {std_dev:.2f}")
+print(f"Variance: {variance:.2f}")
+print(f"Minimum: {min_value}")
+print(f"Maximum: {max_value}")
+print(f"1st Quartile (Q1): {q1}")
+print(f"3rd Quartile (Q3): {q3}")
+
+mean = num_comments.mean()
+median = num_comments.median()
+std_dev = num_comments.std()
+variance = num_comments.var()
+min_value = num_comments.min()
+max_value = num_comments.max()
+q1 = num_comments.quantile(0.25)
+q3 = num_comments.quantile(0.75)
+
+print()
+
+# Print out the statistics
+print(f"Statistics for Comment Count:")
+print(f"Mean: {mean:.2f}")
+print(f"Median: {median:.2f}")
+print(f"Standard Deviation: {std_dev:.2f}")
+print(f"Variance: {variance:.2f}")
+print(f"Minimum: {min_value}")
+print(f"Maximum: {max_value}")
+print(f"1st Quartile (Q1): {q1}")
+print(f"3rd Quartile (Q3): {q3}")
+
+# Calculate statistics for Downvote/Comment (Ratio)
+downvote_mean = aviation_df['Downvote/Comment (Ratio)'].mean()
+downvote_median = aviation_df['Downvote/Comment (Ratio)'].median()
+downvote_std = aviation_df['Downvote/Comment (Ratio)'].std()
+downvote_var = aviation_df['Downvote/Comment (Ratio)'].var()
+downvote_min = aviation_df['Downvote/Comment (Ratio)'].min()
+downvote_max = aviation_df['Downvote/Comment (Ratio)'].max()
+downvote_q1 = aviation_df['Downvote/Comment (Ratio)'].quantile(0.25)
+downvote_q3 = aviation_df['Downvote/Comment (Ratio)'].quantile(0.75)
+
+# Calculate statistics for Upvote/Comment (Ratio)
+upvote_mean = aviation_df['Upvote/Comment (Ratio)'].mean()
+upvote_median = aviation_df['Upvote/Comment (Ratio)'].median()
+upvote_std = aviation_df['Upvote/Comment (Ratio)'].std()
+upvote_var = aviation_df['Upvote/Comment (Ratio)'].var()
+upvote_min = aviation_df['Upvote/Comment (Ratio)'].min()
+upvote_max = aviation_df['Upvote/Comment (Ratio)'].max()
+upvote_q1 = aviation_df['Upvote/Comment (Ratio)'].quantile(0.25)
+upvote_q3 = aviation_df['Upvote/Comment (Ratio)'].quantile(0.75)
+
+# Print statistics for Downvote/Comment (Ratio)
+print("Statistics for Downvote/Comment (Ratio):")
+print(f"Mean: {downvote_mean:.2f}")
+print(f"Median: {downvote_median:.2f}")
+print(f"Standard Deviation: {downvote_std:.2f}")
+print(f"Variance: {downvote_var:.2f}")
+print(f"Minimum: {downvote_min}")
+print(f"Maximum: {downvote_max}")
+print(f"1st Quartile (Q1): {downvote_q1:.2f}")
+print(f"3rd Quartile (Q3): {downvote_q3:.2f}")
+
+print("\nStatistics for Upvote/Comment (Ratio):")
+# Print statistics for Upvote/Comment (Ratio)
+print(f"Mean: {upvote_mean:.2f}")
+print(f"Median: {upvote_median:.2f}")
+print(f"Standard Deviation: {upvote_std:.2f}")
+print(f"Variance: {upvote_var:.2f}")
+print(f"Minimum: {upvote_min}")
+print(f"Maximum: {upvote_max}")
+print(f"1st Quartile (Q1): {upvote_q1:.2f}")
+print(f"3rd Quartile (Q3): {upvote_q3:.2f}")
+
+sns.histplot(aviation_df['Upvote/Comment (Ratio)'], kde=True, color='orange')
+plt.title('Upvote/Comment')
+plt.xlabel('Scores')
+plt.ylabel('Frequency')
+plt.show()
+
+sns.histplot(aviation_df['Downvote/Comment (Ratio)'], kde=True, color='blue')
+plt.title('Downvote/Comment')
+plt.xlabel('Scores')
+plt.ylabel('Frequency')
+plt.show()
+
+sns.histplot(aviation_df['Score'], kde=True, color='skyblue')
+plt.title('Distribution of Scores')
+plt.xlabel('Scores')
+plt.ylabel('Frequency')
+plt.show()
+
+# Box plot for detecting outliers
+sns.boxplot(x=aviation_df['Score'])
+plt.title('Boxplot of Scores')
+plt.show()
