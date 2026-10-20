@@ -1,0 +1,260 @@
+import random
+import time
+import sys
+
+# Character class
+class Character:
+    def __init__(self, name, hp, min_hp, max_hp, min_ap, max_ap, min_combo, max_combo,
+                 mp, max_mp, sp, magic_skills):
+        self.name = name
+        self.hp = hp
+        self.min_hp = min_hp
+        self.max_hp = max_hp
+        self.min_ap = min_ap
+        self.max_ap = max_ap
+        self.min_combo = min_combo
+        self.max_combo = max_combo
+        self.mp = mp
+        self.max_mp = max_mp
+        self.sp = sp
+        self.magic_skills = magic_skills
+    
+    def reset_stats(self):
+        self.hp = self.max_hp
+        self.mp = self.max_mp
+    
+    def attack(self, target):
+        ap = random.randint(self.min_ap, self.max_ap)
+        target.hp -= ap
+        
+    def combo_damage(self, target):
+        combo_ap = random.randint(self.min_combo, self.max_combo)
+        target.hp -= combo_ap
+    
+    def health_boost(self):
+        hp = random.randint(self.min_hp, self.max_hp)
+        self.hp += hp
+    
+    def slow_venom(self, target):
+        damage_per_turn = 20
+        print(f"{target.name} is affected by slow venom!")
+        for _ in range(3):  # Duration of 3 turns
+            target.hp -= damage_per_turn
+            print(f"{target.name} takes {damage_per_turn} damage from slow venom!")
+            
+    def time_warp(self):
+        print("Using Time Warp!")
+        print("You skip this turn and avoid damage.")
+
+# Game class
+class Game:
+    def __init__(self):
+        self.players = []
+        self.enemies = []
+        self.game_in_progress = False
+    
+    def start(self):
+        self.create_players()
+        restart_game = True
+        while restart_game:
+            self.game_in_progress = True
+            self.enemies = self.create_enemies()
+            self.turn_based_game()
+            if self.ask_restart():
+                self.reset_game()
+            else:
+                restart_game = False
+
+    def create_players(self):
+        available_characters = [
+            ("Knight", {
+                "magic_skills": ["combo_damage"],
+                "sp": 10
+            }),
+            ("Warrior", {
+                "magic_skills": ["time_warp", "health_boost"],
+                "sp": 15
+            }),
+            ("Mage", {
+                "magic_skills": ["slow_venom"],
+                "sp": 8
+            })
+        ]
+        
+        num_players = 3
+        for i in range(num_players):
+            print(f"Player {i+1} - Character Selection:")
+            for j, (character_name, character_data) in enumerate(available_characters):
+                magic_skills = character_data["magic_skills"]
+                magic_skills_str = ", ".join(magic_skills)
+                sp = character_data["sp"]
+                print(f"{j+1}) {character_name} (Magic Skills: {magic_skills_str}) (Speed: {sp})")
+
+            print(f"{len(available_characters) + 1}) Quit")
+            choice = int(input("Select your Character: "))
+
+            if choice < 1 or choice > len(available_characters) + 1:
+                print("Invalid choice! Exiting the game.")
+                sys.exit()
+
+            if choice == len(available_characters) + 1:
+                print("Quitting the game.")
+                sys.exit()
+
+            character_name, character_data = available_characters.pop(choice - 1)
+            magic_skills = character_data["magic_skills"]
+            sp = character_data["sp"]
+            hp = random.randint(80, 120)
+            min_hp = random.randint(10, 20)
+            max_hp = random.randint(25, 40)
+            min_ap = random.randint(8, 15)
+            max_ap = random.randint(20, 30)
+            min_combo = random.randint(20, 30)
+            max_combo = random.randint(40, 60)
+            mp = random.randint(10, 20)
+            max_mp = random.randint(10, 20)
+            character = Character(
+                name=f"Player {i+1}",
+                hp=hp, min_hp=min_hp, max_hp=max_hp,
+                min_ap=min_ap, max_ap=max_ap, min_combo=min_combo, max_combo=max_combo,
+                mp=mp, max_mp=max_mp, sp=sp,
+                magic_skills=magic_skills
+            )
+            self.players.append(character)
+
+    def create_enemies(self):
+        return [
+            Character(name="Enemy 1", hp=125, min_hp=0, max_hp=125, 
+                      min_ap=15, max_ap=20, min_combo=0, max_combo=0,
+                      mp=12, max_mp=12, sp=15, magic_skills=[]),
+            Character(name="Enemy 2", hp=115, min_hp=0, max_hp=115,
+                      min_ap=12, max_ap=24, min_combo=0, max_combo=0,
+                      mp=8, max_mp=8, sp=11, magic_skills=[]),
+            Character(name="Enemy 3", hp=150, min_hp=0, max_hp=150, 
+                      min_ap=10, max_ap=20, min_combo=0, max_combo=0,
+                      mp=10, max_mp=10, sp=15, magic_skills=[])
+        ]
+    
+    def turn_based_game(self):
+        while self.game_in_progress:
+            self.players.sort(key=lambda x: x.sp, reverse=True)  # Sort players by speed
+            for player in self.players:
+                if not self.check_enemies_alive():
+                    print("You defeated all enemies!")
+                    self.game_in_progress = False
+                    break
+                if not self.player_alive(player):
+                    print("Player was defeated!")
+                    break
+                self.player_turn(player)
+            self.enemies_turn()
+    
+    def player_turn(self, player):
+        print(f"\n{player.name} - Player's turn")
+        print("Player HP:", player.hp)
+        print("Choose your action:")
+        print("1) Attack")
+        if "combo_damage" in player.magic_skills:
+            print("2) Combo Damage")
+        if "time_warp" in player.magic_skills:
+            print("3) Time Warp")
+        if "health_boost" in player.magic_skills:
+            print("4) Health Boost")
+        if "slow_venom" in player.magic_skills:
+            print("5) Slow Venom")
+        print("6) Restart")
+        print("7) Quit")
+        choice = int(input())
+
+        if choice == 1:
+            self.attack_enemy(player)
+        elif choice == 2 and "combo_damage" in player.magic_skills:
+            target = self.select_enemy()
+            player.combo_damage(target)
+        elif choice == 3 and "time_warp" in player.magic_skills:
+            player.time_warp()
+        elif choice == 4 and "health_boost" in player.magic_skills:
+            player.health_boost()
+        elif choice == 5 and "slow_venom" in player.magic_skills:
+            target = self.select_enemy()
+            player.slow_venom(target)
+        elif choice == 6:
+            if self.ask_restart():
+                self.reset_game()
+                return  # Break the current turn and go back to character selection
+            else:
+                self.game_in_progress = False
+        elif choice == 7:
+            print("Quitting the game.")
+            sys.exit()
+            
+    def ask_restart(self):
+        print("Do you want to restart the game? (y/n)")
+        choice = input()
+        return choice.lower() == 'y'
+    
+    def reset_game(self):
+        self.players = []  # Clear the player list
+        self.enemies = []  # Clear the enemy list
+        self.game_in_progress = False
+    
+    def select_enemy(self):
+        print("Select an enemy to target:")
+        for i, enemy in enumerate(self.enemies):
+            print(f"{i+1}) {enemy.name} (HP: {enemy.hp})")
+        choice = int(input())
+        while choice < 1 or choice > len(self.enemies):
+            print("Invalid choice! Please enter a valid enemy number.")
+            choice = int(input())
+        return self.enemies[choice - 1]
+            
+    def attack_enemy(self, player):
+        for i, enemy in enumerate(self.enemies):
+            print(f"{i+1}) Enemy HP: {enemy.hp} ", end="")
+
+        choice = input("\nSelect an enemy to attack: ")
+        while not choice.isdigit() or int(choice) < 1 or int(choice) > len(self.enemies):
+            print("Invalid choice! Please enter a valid enemy number.")
+            choice = input("Select an enemy to attack: ")
+
+        choice = int(choice) - 1
+        target_enemy = self.enemies[choice]
+        player.attack(target_enemy)
+        print(f"You attacked enemy {choice+1} and dealt damage.")
+        time.sleep(1)
+        
+    def check_enemies_alive(self):
+        alive_enemies = [enemy for enemy in self.enemies if enemy.hp > 0]
+        self.enemies = alive_enemies
+        return len(self.enemies) > 0
+    
+    def enemies_turn(self):
+        print("\nEnemies' turn")
+        for enemy in self.enemies:
+            if not self.check_players_alive():
+                break
+            
+            if enemy.hp > 0:
+                print(f"Enemy HP: {enemy.hp} ", end="")
+                target_player = random.choice(self.players)
+                enemy.attack(target_player)
+                print(f"Enemy attacked {target_player.name} and dealt damage.")
+                time.sleep(1)
+                if not self.player_alive(target_player):
+                    print(f"{target_player.name} was defeated!")
+        
+    def check_players_alive(self):
+        alive_players = [player for player in self.players if player.hp > 0]
+        self.players = alive_players
+        return len(self.players) > 0
+
+    def player_alive(self, player):
+        return player.hp > 0
+
+# Start the game
+game = Game()
+try:
+    game.start()
+except SystemExit as e:
+    print(e)
+    print("You have exited the game. Thanks for playing!")
