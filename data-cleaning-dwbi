@@ -1,52 +1,27 @@
 import pandas as pd
+
+# ==========================================
+# 1. OPTIONAL: Upload files in Google Colab
+# ==========================================
+# Uncomment the lines below if your CSV files are not yet in your Colab environment:
+# from google.colab import files
+# uploaded = files.upload() # Upload 'Booking data.csv' and 'Date data.csv'
+
+# ==========================================
+# 2. BOOKING DATA ANALYSIS
+# ==========================================
+print("=== LOADING BOOKING DATA ===")
 booking_data = pd.read_csv("Booking data.csv")
 
-for column in booking_data.select_dtypes(include='object').columns:
-    print(f"Column: {column}")
-    
-    # Counting each category 
-    category_count = booking_data[column].value_counts()
-    print("Count of each category:\n", category_count)
-    
-    # Percentage of each individual category
-    category_percentage = booking_data[column].value_counts(normalize=True) * 100
-    print("Percentage of each category:\n", category_percentage)
-    print("\n" + "-"*50 + "\n")
-    
-    # clean 1169 rows in meal
-    # clean 5 rows in booking_channel
+# Display data info and first 10 rows
+print("\nData Types:")
+print(booking_data.dtypes)
 
-import pandas as pd
+print("\nFirst 10 rows of Booking Data:")
+display(booking_data.head(10))  # display() works nicely in Colab instead of print()
 
-# Load the new CSV file into a DataFrame
-booking_data = pd.read_csv('Booking data.csv')
-
-# Filter data by 'Tivoli_4' in the 'hotel_id' column
-booking_data_filtered = booking_data[booking_data['hotel_id'] == 'Tivoli_4']
-
-# Finding out the number of categories and percentage for each individual category for categorical data columns
-for column in booking_data_filtered.select_dtypes(include='object').columns:
-    print(f"Column: {column}")
-    
-    # Counting each category 
-    category_count = booking_data_filtered[column].value_counts()
-    print("Count of each category:\n", category_count)
-    
-    # Percentage of each individual category
-    category_percentage = booking_data_filtered[column].value_counts(normalize=True) * 100
-    print("Percentage of each category:\n", category_percentage)
-    print("\n" + "-"*50 + "\n")
-    
-# Clean 1169 rows in 'meal' column if needed (assuming you want to drop rows with specific conditions)
-# booking_data_filtered = booking_data_filtered.dropna(subset=['meal'])
-
-# Clean 5 rows in 'booking_channel' column if needed (assuming you want to drop rows with specific conditions)
-# booking_data_filtered = booking_data_filtered[booking_data_filtered['booking_channel'].notnull()]
-
-booking_data.dtypes
-
-print('''First 10 rows of dataframe:''')
-booking_data.head(10)
+print("\n" + "="*50 + "\n")
+print("=== COMPREHENSIVE EXPLORATION OF BOOKING DATA ===")
 
 for column in booking_data.columns:
     print(f"Column: {column}")
@@ -61,25 +36,44 @@ for column in booking_data.columns:
     else:
         column_stats = booking_data[column].describe()
         print("Basic statistics:\n", column_stats)
-    
+        
     print("\n" + "-"*50 + "\n")
 
-import pandas as pd
+# --- Filtered Analysis for 'Tivoli_4' ---
+print("=== FILTERED ANALYSIS (hotel_id == 'Tivoli_4') ===")
+booking_data_filtered = booking_data[booking_data['hotel_id'] == 'Tivoli_4']
+
+for column in booking_data_filtered.select_dtypes(include='object').columns:
+    print(f"Column: {column}")
+    
+    category_count = booking_data_filtered[column].value_counts()
+    print("Count of each category:\n", category_count)
+    
+    category_percentage = booking_data_filtered[column].value_counts(normalize=True) * 100
+    print("Percentage of each category:\n", category_percentage)
+    print("\n" + "-"*50 + "\n")
+
+# Note: Optional cleaning operations if needed:
+# booking_data_filtered = booking_data_filtered.dropna(subset=['meal'])
+# booking_data_filtered = booking_data_filtered[booking_data_filtered['booking_channel'].notnull()]
+
+
+# ==========================================
+# 3. DATE DATA ANALYSIS
+# ==========================================
+print("=== LOADING DATE DATA ===")
 date_data = pd.read_csv("Date data.csv")
 
+print("\nDate Data Types:")
+print(date_data.dtypes)
+
+print("\n=== EXPLORING DATE DATA CATEGORICAL COLUMNS ===")
 for column in date_data.select_dtypes(include='object').columns:
     print(f"Column: {column}")
     
-    # Counting each category 
     category_count = date_data[column].value_counts()
     print("Count of each category:\n", category_count)
     
-    # Percentage of each individual category
     category_percentage = date_data[column].value_counts(normalize=True) * 100
     print("Percentage of each category:\n", category_percentage)
     print("\n" + "-"*50 + "\n")
-    
-    # clean 1169 rows in meal
-    # clean 5 rows in booking_channel
-
-date_data.dtypes
