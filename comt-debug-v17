@@ -120,6 +120,7 @@ class Game:
         player.attack(target_enemy)
         print(f"You attacked enemy {choice+1} and dealt damage.")
         time.sleep(1)
+
     def check_enemies_alive(self):
         alive_enemies = [enemy for enemy in self.enemies if enemy.hp > 0]
         self.enemies = alive_enemies
@@ -144,5 +145,6 @@ class Game:
         return player.hp > 0
 
 # Start the game
-game = Game()
-game.start()
+if __name__ == "__main__":
+    game = Game()
+    game.start()
