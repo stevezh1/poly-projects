@@ -1,18 +1,33 @@
-while True:
-    user_input = input("Enter a number (type 'exit' to quit): ")
-    if user_input == 'exit':
-        print("User has quit.")
-        break
-    else:
-        number = int(user_input)
-        squared = number ** 2
-        print("The square of", number, "is", squared)
-
 import random
 
-def guess_number(secret_number, attempts):
-    for attempt in range(1, attempts + 1):
-        guess = int(input(f"Attempt {attempt}/{attempts}: Enter your guess: "))
+def number_squaring():
+    print("\n--- Number Squaring Loop ---")
+    while True:
+        user_input = input("Enter a number (type 'exit' to return to menu): ")
+        if user_input.lower() == 'exit':
+            print("Exiting Number Squaring.")
+            break
+        try:
+            number = int(user_input)
+            squared = number ** 2
+            print(f"The square of {number} is {squared}")
+        except ValueError:
+            print("Please enter a valid integer.")
+
+def guess_number_game():
+    print("\n--- Number Guessing Game ---")
+    lower_bound = 1
+    upper_bound = 100
+    secret_number = random.randint(lower_bound, upper_bound)
+    max_attempts = 5
+    
+    for attempt in range(1, max_attempts + 1):
+        try:
+            guess = int(input(f"Attempt {attempt}/{max_attempts} (1-100): Enter your guess: "))
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+            continue
+            
         if guess == secret_number:
             print(f"Congratulations! You guessed the correct number ({secret_number})!")
             return
@@ -20,42 +35,52 @@ def guess_number(secret_number, attempts):
             print("Too low! Try again.")
         else:
             print("Too high! Try again.")
-    
+            
     print(f"Out of attempts. The correct number was {secret_number}.")
-
-def main():
-    print("Welcome to the Number Guessing Game!")
-    lower_bound = 1
-    upper_bound = 100
-    secret_number = random.randint(lower_bound, upper_bound)
-    max_attempts = 5
-    guess_number(secret_number, max_attempts)
-
-if __name__ == "__main__":
-    main()
-
-import random 
 
 def roll_dice():
     return random.randint(1, 6)
 
-def main():
-    print("Welcome to the Dice Rolling Program!")
+def dice_rolling_program():
+    print("\n--- Dice Rolling Program ---")
     rolls = []
     while True:
         input("Press Enter to roll the dice...")
         result = roll_dice()
         print(f"You rolled a {result}")
         rolls.append(result)
-        repeat = input("Roll again? (y/n): ").lower()
+        repeat = input("Roll again? (y/n): ").strip().lower()
         if repeat != 'y':
             break
             
     print("\nDice Roll Results:")
-    for i, roll in enumerate(rolls, start=1)
-        print(f"Roll {i}: {roll}"")
-              
-    print("\nThank you for using the Dice Rolling Program!")
-              
+    for i, roll in enumerate(rolls, start=1):
+        print(f"Roll {i}: {roll}")
+    print("Thank you for using the Dice Rolling Program!")
+
+def main():
+    while True:
+        print("\n==============================")
+        print("GOOGLE COLAB PYTHON PROGRAMS")
+        print("==============================")
+        print("1. Number Squaring Loop")
+        print("2. Number Guessing Game")
+        print("3. Dice Rolling Program")
+        print("4. Exit")
+        
+        choice = input("Select a program to run (1-4): ").strip()
+        
+        if choice == '1':
+            number_squaring()
+        elif choice == '2':
+            guess_number_game()
+        elif choice == '3':
+            dice_rolling_program()
+        elif choice == '4' or choice.lower() == 'exit':
+            print("Exiting. Have a great day!")
+            break
+        else:
+            print("Invalid choice. Please enter a number between 1 and 4.")
+
 if __name__ == "__main__":
     main()
