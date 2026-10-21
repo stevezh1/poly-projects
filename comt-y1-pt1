@@ -83,7 +83,7 @@ class Game:
         
         num_players = 3
         for i in range(num_players):
-            print(f"Player {i+1} - Character Selection:")
+            print(f"\nPlayer {i+1} - Character Selection:")
             for j, (character_name, character_data) in enumerate(available_characters):
                 magic_skills = character_data["magic_skills"]
                 magic_skills_str = ", ".join(magic_skills)
@@ -114,7 +114,7 @@ class Game:
             mp = random.randint(10, 20)
             max_mp = random.randint(10, 20)
             character = Character(
-                name=f"Player {i+1}",
+                name=f"Player {i+1} ({character_name})",
                 hp=hp, min_hp=min_hp, max_hp=max_hp,
                 min_ap=min_ap, max_ap=max_ap, min_combo=min_combo, max_combo=max_combo,
                 mp=mp, max_mp=max_mp, sp=sp,
@@ -144,14 +144,14 @@ class Game:
                     self.game_in_progress = False
                     break
                 if not self.player_alive(player):
-                    print("Player was defeated!")
-                    break
+                    continue
                 self.player_turn(player)
-            self.enemies_turn()
+            
+            if self.game_in_progress and self.check_enemies_alive():
+                self.enemies_turn()
     
     def player_turn(self, player):
-        print(f"\n{player.name} - Player's turn")
-        print("Player HP:", player.hp)
+        print(f"\n{player.name}'s turn (HP: {player.hp})")
         print("Choose your action:")
         print("1) Attack")
         if "combo_damage" in player.magic_skills:
@@ -164,24 +164,31 @@ class Game:
             print("5) Slow Venom")
         print("6) Restart")
         print("7) Quit")
-        choice = int(input())
+        
+        try:
+            choice = int(input("Enter action choice: "))
+        except ValueError:
+            print("Invalid input.")
+            return
 
         if choice == 1:
             self.attack_enemy(player)
         elif choice == 2 and "combo_damage" in player.magic_skills:
             target = self.select_enemy()
             player.combo_damage(target)
+            print(f"You used Combo Damage on {target.name}!")
         elif choice == 3 and "time_warp" in player.magic_skills:
             player.time_warp()
         elif choice == 4 and "health_boost" in player.magic_skills:
             player.health_boost()
+            print("You used Health Boost!")
         elif choice == 5 and "slow_venom" in player.magic_skills:
             target = self.select_enemy()
             player.slow_venom(target)
         elif choice == 6:
             if self.ask_restart():
                 self.reset_game()
-                return  # Break the current turn and go back to character selection
+                return  
             else:
                 self.game_in_progress = False
         elif choice == 7:
@@ -189,14 +196,14 @@ class Game:
             sys.exit()
             
     def ask_restart(self):
-        print("Do you want to restart the game? (y/n)")
-        choice = input()
+        choice = input("Do you want to restart the game? (y/n): ")
         return choice.lower() == 'y'
     
     def reset_game(self):
-        self.players = []  # Clear the player list
-        self.enemies = []  # Clear the enemy list
+        self.players = []  
+        self.enemies = []  
         self.game_in_progress = False
+        self.create_players()
     
     def select_enemy(self):
         print("Select an enemy to target:")
@@ -210,7 +217,7 @@ class Game:
             
     def attack_enemy(self, player):
         for i, enemy in enumerate(self.enemies):
-            print(f"{i+1}) Enemy HP: {enemy.hp} ", end="")
+            print(f"{i+1}) {enemy.name} HP: {enemy.hp}  ", end="")
 
         choice = input("\nSelect an enemy to attack: ")
         while not choice.isdigit() or int(choice) < 1 or int(choice) > len(self.enemies):
@@ -220,7 +227,7 @@ class Game:
         choice = int(choice) - 1
         target_enemy = self.enemies[choice]
         player.attack(target_enemy)
-        print(f"You attacked enemy {choice+1} and dealt damage.")
+        print(f"You attacked {target_enemy.name} and dealt damage.")
         time.sleep(1)
         
     def check_enemies_alive(self):
@@ -229,20 +236,21 @@ class Game:
         return len(self.enemies) > 0
     
     def enemies_turn(self):
-        print("\nEnemies' turn")
+        print("\n--- Enemies' turn ---")
         for enemy in self.enemies:
             if not self.check_players_alive():
+                print("All players were defeated! Game Over.")
+                self.game_in_progress = False
                 break
             
             if enemy.hp > 0:
-                print(f"Enemy HP: {enemy.hp} ", end="")
                 target_player = random.choice(self.players)
                 enemy.attack(target_player)
-                print(f"Enemy attacked {target_player.name} and dealt damage.")
+                print(f"{enemy.name} attacked {target_player.name} and dealt damage. ({target_player.name} HP: {target_player.hp})")
                 time.sleep(1)
                 if not self.player_alive(target_player):
                     print(f"{target_player.name} was defeated!")
-        
+                    
     def check_players_alive(self):
         alive_players = [player for player in self.players if player.hp > 0]
         self.players = alive_players
@@ -252,9 +260,9 @@ class Game:
         return player.hp > 0
 
 # Start the game
-game = Game()
-try:
-    game.start()
-except SystemExit as e:
-    print(e)
-    print("You have exited the game. Thanks for playing!")
+if __name__ == "__main__":
+    game = Game()
+    try:
+        game.start()
+    except SystemExit as e:
+        print("You have exited the game. Thanks for playing!")
