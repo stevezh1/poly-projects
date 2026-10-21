@@ -1,141 +1,7 @@
-class PlayerCharacter:
-    def __init__(self, hp, max_hp, ap, mp, sp, max_mp, magic_skills):
-        self.hp = hp
-        self.max_hp = max_hp
-        self.ap = ap
-        self.mp = mp
-        self.sp = sp
-        self.max_mp = max_mp
-        self.magic_skills = magic_skills
-    def reset_stats(self):
-        self.hp = self_max_hp
-        self.mp = self_max_mp
-        
-class EnemyCharacter:
-    def __init__(self, hp, max_hp, ap, mp, sp, max_mp, magic_skills):
-        self.hp = hp
-        self.max_hp = max_hp
-        self.ap = ap
-        self.mp = mp
-        self.sp = sp
-        self.max_mp = max_mp
-        self.magic_skills = magic_skills
-    def reset_stats(self):
-        self.hp = self_max_hp
-        self.mp = self_max_mp
-              
+import random
 
-while True:
-    
-    choice=0
-    
-    print("Choose your character: ")
-    print("1) Knight")
-    print("2) Warrior")
-    print("3) Quit")
-    choice = int(input())
-    
-    if choice == 1:
-        p1 = PlayerCharacter(hp=120,
-    max_hp=120,
-    ap=12,
-    mp=15,
-    sp=10,
-    max_mp=15,
-    magic_skills=[skill]) #p1 = knight
-        
-        e1 = EnemyCharacter(hp=125,
-    max_hp=125,
-    ap=12,
-    mp=12,
-    sp=8,
-    max_mp=12) # e1 = defender
-        
-        e2 = EnemyCharacter(enemy_hp=115,
-    enemy_max_hp=115,
-    enemy_ap=15,
-    enemy_mp=8,
-    enemy_max_mp=8,
-    enemy_sp=10) # e2 = barbarian
-    
-    elif choice == 2:
-        p2 = PlayerCharacter(hp=150,
-    max_hp=150,
-    ap=15,
-    mp=10,
-    max_mp=10,
-    magic_skills=[skill2]) # p1 = warrior
-        
-        e1 = EnemyCharacter(hp=125,
-    max_hp=125,
-    ap=12,
-    mp=12,
-    sp=8
-    max_mp=12) # e1 = defender
-        
-        e2 = EnemyCharacter(enemy_hp=115,
-    enemy_max_hp=115,
-    enemy_ap=15,
-    enemy_mp=8,
-    enemy_max_mp=8,
-    enemy_sp=10) # e2 = barbarian
-    
-    elif choice == 3:
-        print("Player quit")
-        break
-                      
-    action=0
-    
-    print("Choose: ")
-    print("1) Attack")
-    print("2) Quit")
-    print("3) Restart")
-    action = int(input())
-    
-    
-    if action == 1:
-        p1.hp = p1.hp - e1.ap
-        print("Player 1 attacks Enemy 1")
-        print("Enemy Health",e1.hp)
-        if e1.hp == 0:
-            print("Player wins")
-            
-        p1.hp = p1.hp - e2.ap
-        print("Player 1 attacks Enemy 2")
-        print("Enemy Health",e2.hp)
-        if e2.hp == 0:
-            print("Player wins")
-            break
-    elif action == 2:
-            print("Player quit")
-            break
-    elif action == 3:
-            print("Player restarted")
-            p1.reset_stats()
-            
-    print("Enemy attacks")
-    knight.hp - knight.hp - enemy_ap
-    if knight.hp == 0:
-        print("Player lost")
-        break
-
-#magic skills
-
-
-print("Choose: ")
-    print("1) Attack")
-    print("2) Quit")
-    print("3) Restart")
-    print("4)",knight.magic_skills[0].name)
-    action = int(input())
-
-#4 different unique skills
-
-
-
-
-
-class combo_damage:
+# Skill Classes
+class ComboDamage:
     def __init__(self, name, power, skill_type):
         self.name = name
         self.power = power
@@ -147,10 +13,9 @@ class combo_damage:
     def use_skill(self, target, dp):
         target.hp = target.hp - dp
         
-skill = combo_damage("Combo Damage",24,"attack")
 
-class health_regeneration:
-    def __init__ (self, name, power, skill_type):
+class HealthRegeneration:
+    def __init__(self, name, power, skill_type):
         self.name = name
         self.power = power
         self.skill_type = skill_type
@@ -160,9 +25,14 @@ class health_regeneration:
     
     def use_skill(self, target, hp):
         target.hp = target.hp + hp
-        
-skill2 = health_regeneration("Health Regeneration",18,"heal)
 
+
+# Initialize Skills
+skill = ComboDamage("Combo Damage", 24, "attack")
+skill2 = HealthRegeneration("Health Regeneration", 18, "heal")
+
+
+# Character Classes
 class PlayerCharacter:
     def __init__(self, hp, max_hp, ap, mp, max_mp, sp, magic_skills):
         self.hp = hp
@@ -172,85 +42,127 @@ class PlayerCharacter:
         self.sp = sp
         self.max_mp = max_mp
         self.magic_skills = magic_skills
-    def reset_stats(self):
-        self.hp = self_max_hp
-        self.mp = self_max_mp
         
+    def reset_stats(self):
+        self.hp = self.max_hp
+        self.mp = self.max_mp
+        
+
 class EnemyCharacter:
-    def __init__(self, hp, max_hp, ap, mp, sp, max_mp, magic_skills):
+    def __init__(self, hp, max_hp, ap, mp, max_mp, sp, magic_skills=None):
         self.hp = hp
         self.max_hp = max_hp
         self.ap = ap
         self.mp = mp
         self.sp = sp
         self.max_mp = max_mp
-        self.magic_skills = magic_skills
-    def reset_stats(self):
-        self.hp = self_max_hp
-        self.mp = self_max_mp
-              
-while True:
-
-    p1 = PlayerCharacter(hp=120,
-    max_hp=120,
-    ap=12,
-    mp=15,
-    sp=10,
-    max_mp=15,
-    magic_skills=[skill])
-
-    p2 = PlayerCharacter(hp=150,
-    max_hp=150,
-    ap=15,
-    mp=10,
-    max_mp=10,
-    magic_skills=[skill2]) # p1 = warrior
-
-    e1 = EnemyCharacter(enemy_hp=125,
-    enemy_max_hp=125,
-    enemy_ap=12,
-    enemy_mp=12,
-    enemy_max_mp=12,
-    enemy_sp=8) # e1 = defender
+        self.magic_skills = magic_skills if magic_skills else []
         
-    e2 = EnemyCharacter(enemy_hp=115,
-    enemy_max_hp=115,
-    enemy_ap=15,
-    enemy_mp=8,
-    enemy_max_mp=8,
-    enemy_sp=10) # e2 = barbarian
-    
-action=0
-    
-print("Choose: ")
-print("1) Attack")
-print("2) Quit")
-print("3) Restart")
-action = int(input())
-    
-    
-if action == 1:
-    p1.hp = p1.hp - e1.ap
-    print("Player 1 attacks Enemy 1")
-    print("Enemy Health",e1.hp)
-        if e1.hp == 0:
-            print("Player wins")
+    def reset_stats(self):
+        self.hp = self.max_hp
+        self.mp = self.max_mp
+
+
+# Main Game Loop
+def main():
+    while True:
+        print("\n==============================")
+        print("Choose your character: ")
+        print("1) Knight")
+        print("2) Warrior")
+        print("3) Quit")
+        
+        try:
+            choice = int(input("Enter choice (1-3): "))
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+            continue
+        
+        if choice == 1:
+            player = PlayerCharacter(hp=120, max_hp=120, ap=12, mp=15, max_mp=15, sp=10, magic_skills=[skill])
+            print("You selected Knight!")
+        elif choice == 2:
+            player = PlayerCharacter(hp=150, max_hp=150, ap=15, mp=10, max_mp=10, sp=12, magic_skills=[skill2])
+            print("You selected Warrior!")
+        elif choice == 3:
+            print("Player quit.")
+            break
+        else:
+            print("Invalid choice. Try again.")
+            continue
             
-    p1.hp = p1.hp - e2.ap
-    print("Player 1 attacks Enemy 2")
-    print("Enemy Health",e2.hp)
-        if e2.hp == 0:
-            print("Player wins")
-        break
-elif action == 2:
-    print("Player quit")
-        break
-elif action == 3:
-    print("Player restarted")
-        p1.reset_stats()
+        # Initialize Enemies
+        e1 = EnemyCharacter(hp=125, max_hp=125, ap=12, mp=12, max_mp=12, sp=8) # Defender
+        e2 = EnemyCharacter(hp=115, max_hp=115, ap=15, mp=8, max_mp=8, sp=10)  # Barbarian
+        
+        # Combat Loop
+        while player.hp > 0 and (e1.hp > 0 or e2.hp > 0):
+            print("\n------------------------------")
+            print(f"Player HP: {player.hp}/{player.max_hp} | MP: {player.mp}/{player.max_mp}")
+            print(f"Enemy 1 HP: {e1.hp} | Enemy 2 HP: {e2.hp}")
+            print("Choose your action: ")
+            print("1) Attack")
+            print(f"4) Use Skill ({player.magic_skills[0].name})")
+            print("2) Quit Game")
+            print("3) Restart Selection")
             
-    print("Enemy attacks")
-    knight.hp - knight.hp - enemy_ap
-        if knight.hp == 0:
-    print("Player lost")
-        break
+            try:
+                action = int(input("Enter action: "))
+            except ValueError:
+                print("Invalid input.")
+                continue
+            
+            if action == 1:
+                # Attack Enemy 1 if alive, else Enemy 2
+                target = e1 if e1.hp > 0 else e2
+                target.hp -= player.ap
+                print(f"You attacked the enemy and dealt {player.ap} damage!")
+                
+                if target.hp <= 0:
+                    print("An enemy was defeated!")
+                    
+            elif action == 4:
+                skill_obj = player.magic_skills[0]
+                if skill_obj.skill_type == "attack":
+                    target = e1 if e1.hp > 0 else e2
+                    skill_obj.use_skill(target, skill_obj.power)
+                    print(f"You used {skill_obj.name} and dealt {skill_obj.power} damage!")
+                elif skill_obj.skill_type == "heal":
+                    skill_obj.use_skill(player, skill_obj.power)
+                    if player.hp > player.max_hp:
+                        player.hp = player.max_hp
+                    print(f"You used {skill_obj.name} and restored {skill_obj.power} HP!")
+                    
+            elif action == 2:
+                print("Player quit the game.")
+                return
+            elif action == 3:
+                print("Restarting character selection...")
+                break
+            else:
+                print("Invalid action.")
+                continue
+                
+            # Check Win Condition
+            if e1.hp <= 0 and e2.hp <= 0:
+                print("\nCONGRATULATIONS! You defeated all enemies and won the game!")
+                break
+                
+            # Enemy Turn
+            print("\n--- Enemy Turn ---")
+            total_enemy_damage = 0
+            if e1.hp > 0:
+                total_enemy_damage += e1.ap
+            if e2.hp > 0:
+                total_enemy_damage += e2.ap
+                
+            player.hp -= total_enemy_damage
+            print(f"Enemies attacked you for a total of {total_enemy_damage} damage!")
+            
+            # Check Loss Condition
+            if player.hp <= 0:
+                print("\nGAME OVER: Player lost all HP.")
+                break
+
+if __name__ == "__main__":
+    main()
