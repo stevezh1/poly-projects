@@ -1,210 +1,155 @@
-import tkinter as tk
-from tkinter import messagebox
+import ipywidgets as widgets
+from IPython.display import display, clear_output
 import random
-import time
 
-# Character class
+# Character class definition
 class Character:
-    def __init__(self, name, hp, min_hp, max_hp, min_ap, max_ap, min_combo, max_combo,
-                 mp, max_mp, sp, magic_skills):
+    def __init__(self, name, hp, min_ap, max_ap, sp, skills=None):
         self.name = name
         self.hp = hp
-        self.min_hp = min_hp
-        self.max_hp = max_hp
+        self.max_hp = hp
         self.min_ap = min_ap
         self.max_ap = max_ap
-        self.min_combo = min_combo
-        self.max_combo = max_combo
-        self.mp = mp
-        self.max_mp = max_mp
         self.sp = sp
-        self.magic_skills = magic_skills
-    
-    def reset_stats(self):
-        self.hp = self.max_hp
-        self.mp = self.max_mp
-    
+        self.skills = skills if skills else []
+        
     def attack(self, target):
-        ap = random.randint(self.min_ap, self.max_ap)
-        target.hp -= ap
-        
-    def combo_damage(self, target):
-        combo_ap = random.randint(self.min_combo, self.max_combo)
-        target.hp -= combo_ap
-    
-    def health_boost(self):
-        hp = random.randint(self.min_hp, self.max_hp)
-        self.hp += hp
-    
-    def slow_venom(self, target):
-        damage_per_turn = 20
-        target.hp -= damage_per_turn
-          
-    def time_warp(self):
-        pass
+        dmg = random.randint(self.min_ap, self.max_ap)
+        target.hp = max(0, target.hp - dmg)
+        return dmg
 
-# Game class
-class Game:
+class ColabRPGApp:
     def __init__(self):
-        self.players = []
+        self.player = None
         self.enemies = []
-        self.game_in_progress = False
-    
-    def create_enemies(self):
-        return [
-            Character(name="Enemy 1", hp=125, min_hp=0, max_hp=125, 
-                      min_ap=15, max_ap=20, min_combo=0, max_combo=0,
-                      mp=12, max_mp=12, sp=15, magic_skills=[]),
-            Character(name="Enemy 2", hp=115, min_hp=0, max_hp=115,
-                      min_ap=12, max_ap=24, min_combo=0, max_combo=0,
-                      mp=8, max_mp=8, sp=11, magic_skills=[]),
-            Character(name="Enemy 3", hp=150, min_hp=0, max_hp=150, 
-                      min_ap=10, max_ap=20, min_combo=0, max_combo=0,
-                      mp=10, max_mp=10, sp=15, magic_skills=[])
-        ]
-    
-    def init_game(self):
-        self.enemies = self.create_enemies()
-        self.game_in_progress = True
-
-class SettingsPage(tk.Frame):
-    def __init__(self, parent, controller):
-        super().__init__(parent)
-        self.controller = controller
-
-        label = tk.Label(self, text="Settings", font=("Arial", 14, "bold"))
-        label.pack(pady=10)
-
-        volume_label = tk.Label(self, text="Adjust Volume:")
-        volume_label.pack()
-
-        volume_scale = tk.Scale(self, from_=0, to=100, orient=tk.HORIZONTAL)
-        volume_scale.pack(pady=5)
-
-        difficulty_label = tk.Label(self, text="Difficulty Level:")
-        difficulty_label.pack()
-
-        difficulty_scale = tk.Scale(self, from_=1, to=3, orient=tk.HORIZONTAL)
-        difficulty_scale.pack(pady=5)
-
-        back_button = tk.Button(self, text="Back to Main Menu", command=lambda: controller.change_frame("StartPage"))
-        back_button.pack(pady=20)
-
-class StartPage(tk.Frame):
-    def __init__(self, parent, controller):
-        super().__init__(parent)
-        self.controller = controller
-
-        label = tk.Label(self, text="Main Menu", font=("Arial", 16, "bold"))
-        label.pack(pady=20)
-
-        start_button = tk.Button(self, text="Start Game", width=20, height=2, command=lambda: controller.change_frame("SelectionPage"))
-        start_button.pack(pady=10)
-
-        settings_button = tk.Button(self, text="Settings", width=20, height=2, command=lambda: controller.change_frame("SettingsPage"))
-        settings_button.pack(pady=10)
-
-        quit_button = tk.Button(self, text="Quit", width=20, height=2, command=parent.master.destroy)
-        quit_button.pack(pady=10)
-
-class SelectionPage(tk.Frame):
-    def __init__(self, parent, controller, game):
-        super().__init__(parent)
-        self.controller = controller
-        self.game = game
         
-        label = tk.Label(self, text="Player Selection", font=("Arial", 16, "bold"))
-        label.pack(pady=10)
+        # UI Container and Output areas
+        self.container = widgets.VBox()
+        self.output = widgets.Output()
         
-        self.characters = [
-            {"name": "Knight", "stats": "HP: 120, AP: 10-25, Speed: 10", "skills": ["combo_damage"]},
-            {"name": "Warrior", "stats": "HP: 120, AP: 10-25, Speed: 15", "skills": ["time_warp", "health_boost"]},
-            {"name": "Mage", "stats": "HP: 120, AP: 10-25, Speed: 8", "skills": ["slow_venom"]}
-        ]
+        self.show_character_selection()
+
+    def display_app(self):
+        display(self.container, self.output)
+
+    def show_character_selection(self):
+        with self.output:
+            clear_output()
+            print("Welcome to the RPG Game Arena!")
         
-        for char_info in self.characters:
-            btn = tk.Button(
-                self,
-                text=f"Select {char_info['name']} ({char_info['stats']})",
-                width=45,
-                height=2,
-                command=lambda c=char_info: self.select_character(c)
-            )
-            btn.pack(pady=5)
-
-        back_button = tk.Button(self, text="Back to Main Menu", command=lambda: controller.change_frame("StartPage"))
-        back_button.pack(pady=20)
-
-    def select_character(self, character):
-        new_player = Character(
-            name=character["name"],
-            hp=120, min_hp=15, max_hp=30,
-            min_ap=10, max_ap=25, min_combo=25, max_combo=50,
-            mp=15, max_mp=15, sp=10, magic_skills=character["skills"]
+        self.char_dropdown = widgets.Dropdown(
+            options=[
+                ('Knight (Balanced Stats, Combo Skill)', 'Knight'), 
+                ('Warrior (High HP & Health Boost)', 'Warrior'), 
+                ('Mage (Special Venom Skill)', 'Mage')
+            ],
+            description='Hero:',
         )
-        self.game.players.append(new_player)
-        messagebox.showinfo("Selection", f"You selected {character['name']}!")
-        self.game.init_game()
-        self.controller.change_frame("BattlePage")
+        self.btn_select = widgets.Button(description="Start Adventure", button_style='success')
+        self.btn_select.on_click(self.on_character_selected)
+        
+        self.container.children = [
+            widgets.HTML("<h3>Choose Your Character Class</h3>"), 
+            self.char_dropdown, 
+            self.btn_select
+        ]
 
-class BattlePage(tk.Frame):
-    def __init__(self, parent, controller, game):
-        super().__init__(parent)
-        self.controller = controller
-        self.game = game
-
-        label = tk.Label(self, text="Battle Page", font=("Arial", 16, "bold"))
-        label.pack(pady=10)
-
-        self.status_label = tk.Label(self, text="Battle in progress...", font=("Arial", 12))
-        self.status_label.pack(pady=10)
-
-        attack_options = ["Combo Damage", "Time Warp", "Health Boost", "Slow Venom", "Standard Attack"]
-        self.selected_attack = tk.StringVar(value=attack_options[0])
-
-        option_menu = tk.OptionMenu(self, self.selected_attack, *attack_options)
-        option_menu.pack(pady=5)
-
-        action_button = tk.Button(self, text="Perform Action", command=self.perform_action, width=20, height=2)
-        action_button.pack(pady=10)
-
-        back_button = tk.Button(self, text="Back to Selection", command=lambda: controller.change_frame("SelectionPage"))
-        back_button.pack(pady=20)
-
-    def perform_action(self):
-        action = self.selected_attack.get()
-        messagebox.showinfo("Action", f"Performed: {action}")
-
-class MyApp(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        self.title("My RPG Game")
-        self.geometry("800x600")
-
-        self.game = Game()
-
-        container = tk.Frame(self)
-        container.pack(side="top", fill="both", expand=True)
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
-
-        self.frames = {}
-        for F in (StartPage, SettingsPage, SelectionPage, BattlePage):
-            page_name = F.__name__
-            if F in (SelectionPage, BattlePage):
-                frame = F(parent=container, controller=self, game=self.game)
-            else:
-                frame = F(parent=container, controller=self)
+    def on_character_selected(self, b):
+        char_type = self.char_dropdown.value
+        if char_type == 'Knight':
+            self.player = Character("Knight", 120, 10, 25, 10, ["Combo Damage"])
+        elif char_type == 'Warrior':
+            self.player = Character("Warrior", 150, 12, 20, 15, ["Health Boost"])
+        else:
+            self.player = Character("Mage", 115, 8, 28, 8, ["Slow Venom"])
             
-            self.frames[page_name] = frame
-            frame.grid(row=0, column=0, sticky="nsew")
+        # Initialize Enemies
+        self.enemies = [
+            Character("Defender", 100, 10, 18, 12),
+            Character("Barbarian", 110, 12, 22, 10)
+        ]
+        
+        self.show_battle_screen()
 
-        self.change_frame("StartPage")
+    def show_battle_screen(self):
+        with self.output:
+            clear_output()
+            print(f"Battle started! You are playing as a {self.player.name}.")
+            print(f"Your HP: {self.player.hp} | Enemies Remaining: {len(self.enemies)}")
+            
+        self.btn_attack = widgets.Button(description="Standard Attack", button_style='danger')
+        self.btn_skill = widgets.Button(description=f"Use Skill ({self.player.skills[0]})", button_style='warning')
+        self.btn_restart = widgets.Button(description="Main Menu", button_style='info')
+        
+        self.btn_attack.on_click(self.on_attack)
+        self.btn_skill.on_click(self.on_skill)
+        self.btn_restart.on_click(lambda x: self.show_character_selection())
+        
+        self.container.children = [
+            widgets.HTML(f"<h3>Battle Arena — {self.player.name} (HP: {self.player.hp})</h3>"),
+            widgets.HBox([self.btn_attack, self.btn_skill, self.btn_restart])
+        ]
 
-    def change_frame(self, page_name):
-        frame = self.frames[page_name]
-        frame.tkraise()
+    def on_attack(self, b):
+        with self.output:
+            clear_output(wait=True)
+            if not self.enemies:
+                print("🎉 All enemies defeated! You win!")
+                self.container.children = [widgets.HTML("<h3>Victory! All enemies defeated.</h3>")]
+                return
+            
+            target = self.enemies[0]
+            dmg = self.player.attack(target)
+            print(f"⚔️ You attacked {target.name} for {dmg} damage! ({target.name} HP: {target.hp})")
+            
+            if target.hp <= 0:
+                print(f"💥 {target.name} was defeated!")
+                self.enemies.pop(0)
+                if not self.enemies:
+                    print("🏆 Victory! You cleared the arena!")
+                    self.container.children = [widgets.HTML("<h3>Victory! You win!</h3>")]
+                    return
 
-if __name__ == "__main__":
-    app = MyApp()
-    app.mainloop()
+            # Enemy Counterattack
+            self.process_enemy_turn()
+
+    def on_skill(self, b):
+        with self.output:
+            clear_output(wait=True)
+            skill_name = self.player.skills[0]
+            if skill_name == "Health Boost":
+                heal = random.randint(20, 40)
+                self.player.hp = min(self.player.max_hp, self.player.hp + heal)
+                print(f"✨ Used Health Boost! Restored {heal} HP. Current HP: {self.player.hp}")
+            else:
+                if self.enemies:
+                    target = self.enemies[0]
+                    dmg = random.randint(30, 50)
+                    target.hp = max(0, target.hp - dmg)
+                    print(f"🔥 Used {skill_name} on {target.name} for massive {dmg} damage! ({target.name} HP: {target.hp})")
+                    if target.hp <= 0:
+                        print(f"💥 {target.name} was defeated!")
+                        self.enemies.pop(0)
+                
+            if not self.enemies:
+                print("🏆 Victory! You defeated all enemies!")
+                self.container.children = [widgets.HTML("<h3>Victory! You win!</h3>")]
+                return
+
+            self.process_enemy_turn()
+
+    def process_enemy_turn(self):
+        for enemy in self.enemies:
+            if enemy.hp > 0:
+                edmg = enemy.attack(self.player)
+                print(f"🛡️ {enemy.name} retaliated for {edmg} damage! Your HP: {self.player.hp}")
+                if self.player.hp <= 0:
+                    print("💀 Game Over! You were defeated.")
+                    self.container.children = [widgets.HTML("<h3>Game Over</h3>")]
+                    self.btn_attack.disabled = True
+                    self.btn_skill.disabled = True
+                    return
+
+# Run the app inside Colab
+game = ColabRPGApp()
+game.display_app()
